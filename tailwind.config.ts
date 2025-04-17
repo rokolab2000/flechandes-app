@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -61,6 +62,31 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// Custom Move-It-Easy colors
+				'move-blue': {
+					50: '#EBF8FF',
+					100: '#D1EEFC',
+					200: '#A7D8F0',
+					300: '#7CC1E4',
+					400: '#55AAD4',
+					500: '#3994C1',
+					600: '#2D749A',
+					700: '#235A79',
+					800: '#1B4559',
+					900: '#0F2A36',
+				},
+				'move-green': {
+					50: '#F0FDF4',
+					100: '#DCFCE7',
+					200: '#BBF7D0',
+					300: '#86EFAC',
+					400: '#4ADE80',
+					500: '#22C55E',
+					600: '#16A34A',
+					700: '#15803D',
+					800: '#166534',
+					900: '#14532D',
 				}
 			},
 			borderRadius: {
