@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -19,6 +18,9 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+        'halvar': ['Halvar Engschrift', 'sans-serif'],
+      },
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -87,7 +89,12 @@ export default {
 					700: '#15803D',
 					800: '#166534',
 					900: '#14532D',
-				}
+				},
+				'flechandes': {
+          primary: '#DB2851',
+          secondary: '#009EE2',
+          background: '#f0f0f0',
+        },
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

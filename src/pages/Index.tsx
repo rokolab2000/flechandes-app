@@ -1,4 +1,3 @@
-
 import { useNavigate } from 'react-router-dom';
 import { CalendarDays, Truck, Map, Star, Package, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -50,14 +49,14 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col font-halvar">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-b from-white to-move-blue-50 py-16 px-4">
+      <section className="relative bg-gradient-to-b from-white to-[#f0f0f0] py-16 px-4">
         <div className="container mx-auto max-w-4xl text-center">
           <Logo size="lg" className="mx-auto mb-6" />
           
           <h1 className="text-4xl font-bold mb-4 text-gray-800">
-            Mudanzas <span className="text-move-blue-500">Simples</span>
+            Mudanzas <span className="text-[#009EE2]">Simples</span>
           </h1>
           
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
@@ -66,7 +65,7 @@ const Index = () => {
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
-              className="bg-move-blue-500 hover:bg-move-blue-600 text-white font-medium py-6 px-8 rounded-lg text-lg shadow-lg" 
+              className="bg-[#DB2851] hover:bg-[#c11f45] text-white font-medium py-6 px-8 rounded-lg text-lg shadow-lg" 
               onClick={() => navigate('/login')}
             >
               Comenzar <ArrowRight className="ml-2 h-5 w-5" />
