@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -46,8 +47,8 @@ const NewService = () => {
   const renderStep1 = () => (
     <>
       <div className="mb-6">
-        <h2 className="text-xl font-bold mb-2">What type of service do you need?</h2>
-        <p className="text-gray-600">Choose the service that best fits your needs</p>
+        <h2 className="text-xl font-bold mb-2">¿Qué tipo de servicio necesitas?</h2>
+        <p className="text-gray-600">Elige el servicio que mejor se adapte a tus necesidades</p>
       </div>
       
       <RadioGroup 
@@ -59,8 +60,8 @@ const NewService = () => {
           <div className="flex items-start">
             <RadioGroupItem value="moving" id="moving" className="mt-1" />
             <div className="ml-3">
-              <Label htmlFor="moving" className="text-lg font-medium">Full Moving Service</Label>
-              <p className="text-gray-600">Professional movers will pack, load, transport, and unload your items</p>
+              <Label htmlFor="moving" className="text-lg font-medium">Servicio Completo de Mudanza</Label>
+              <p className="text-gray-600">Profesionales se encargarán de embalar, cargar, transportar y descargar tus artículos</p>
             </div>
           </div>
         </div>
@@ -69,8 +70,8 @@ const NewService = () => {
           <div className="flex items-start">
             <RadioGroupItem value="delivery" id="delivery" className="mt-1" />
             <div className="ml-3">
-              <Label htmlFor="delivery" className="text-lg font-medium">Delivery Service</Label>
-              <p className="text-gray-600">Transport specific items from one location to another</p>
+              <Label htmlFor="delivery" className="text-lg font-medium">Servicio de Entrega</Label>
+              <p className="text-gray-600">Transporte de artículos específicos de un lugar a otro</p>
             </div>
           </div>
         </div>
@@ -79,8 +80,8 @@ const NewService = () => {
           <div className="flex items-start">
             <RadioGroupItem value="freight" id="freight" className="mt-1" />
             <div className="ml-3">
-              <Label htmlFor="freight" className="text-lg font-medium">Freight Service</Label>
-              <p className="text-gray-600">Transport large or heavy items requiring special equipment</p>
+              <Label htmlFor="freight" className="text-lg font-medium">Servicio de Carga</Label>
+              <p className="text-gray-600">Transporte de artículos grandes o pesados que requieren equipamiento especial</p>
             </div>
           </div>
         </div>
@@ -91,30 +92,30 @@ const NewService = () => {
   const renderStep2 = () => (
     <>
       <div className="mb-6">
-        <h2 className="text-xl font-bold mb-2">Location & Schedule</h2>
-        <p className="text-gray-600">Tell us where and when you need the service</p>
+        <h2 className="text-xl font-bold mb-2">Ubicación y Horario</h2>
+        <p className="text-gray-600">Dinos dónde y cuándo necesitas el servicio</p>
       </div>
       
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="pickup-address">Pickup Address</Label>
+          <Label htmlFor="pickup-address">Dirección de Recogida</Label>
           <div className="relative">
             <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input 
               id="pickup-address" 
-              placeholder="Enter pickup address" 
+              placeholder="Ingresa la dirección de recogida" 
               className="pl-10"
             />
           </div>
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="delivery-address">Delivery Address</Label>
+          <Label htmlFor="delivery-address">Dirección de Entrega</Label>
           <div className="relative">
             <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input 
               id="delivery-address" 
-              placeholder="Enter delivery address" 
+              placeholder="Ingresa la dirección de entrega" 
               className="pl-10"
             />
           </div>
@@ -124,7 +125,7 @@ const NewService = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="service-date">Date</Label>
+            <Label htmlFor="service-date">Fecha</Label>
             <div className="relative">
               <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input 
@@ -136,7 +137,7 @@ const NewService = () => {
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="service-time">Time</Label>
+            <Label htmlFor="service-time">Hora</Label>
             <div className="relative">
               <Clock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
               <Input 
@@ -154,46 +155,46 @@ const NewService = () => {
   const renderStep3 = () => (
     <>
       <div className="mb-6">
-        <h2 className="text-xl font-bold mb-2">Item Details</h2>
-        <p className="text-gray-600">Describe what needs to be transported</p>
+        <h2 className="text-xl font-bold mb-2">Detalles de los Artículos</h2>
+        <p className="text-gray-600">Describe lo que necesitas transportar</p>
       </div>
       
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="items-description">Items Description</Label>
+          <Label htmlFor="items-description">Descripción de los Artículos</Label>
           <Textarea 
             id="items-description" 
-            placeholder="Describe items to be moved (e.g., furniture, boxes, appliances)"
+            placeholder="Describe los artículos a transportar (ej. muebles, cajas, electrodomésticos)"
             rows={3}
           />
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="space-y-2">
-            <Label htmlFor="approximate-weight">Approximate Weight (lbs)</Label>
+            <Label htmlFor="approximate-weight">Peso Aproximado (kg)</Label>
             <Input 
               id="approximate-weight" 
               type="number"
-              placeholder="Enter weight"
+              placeholder="Ingresa el peso"
             />
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="approximate-volume">Approximate Volume (cu ft)</Label>
+            <Label htmlFor="approximate-volume">Volumen Aproximado (m³)</Label>
             <Input 
               id="approximate-volume" 
               type="number"
-              placeholder="Enter volume"
+              placeholder="Ingresa el volumen"
             />
           </div>
         </div>
         
         <div className="space-y-2">
-          <Label>Are there any fragile items?</Label>
+          <Label>¿Hay artículos frágiles?</Label>
           <div className="flex gap-4">
             <div className="flex items-center">
               <input type="radio" id="fragile-yes" name="fragile" className="mr-2" />
-              <label htmlFor="fragile-yes">Yes</label>
+              <label htmlFor="fragile-yes">Sí</label>
             </div>
             <div className="flex items-center">
               <input type="radio" id="fragile-no" name="fragile" className="mr-2" />
@@ -203,21 +204,21 @@ const NewService = () => {
         </div>
         
         <div className="space-y-2">
-          <Label>Add Photos (Optional)</Label>
+          <Label>Añadir Fotos (Opcional)</Label>
           <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
             <Camera className="h-8 w-8 mx-auto text-gray-400 mb-2" />
-            <p className="text-sm text-gray-500 mb-2">Upload photos of your items</p>
+            <p className="text-sm text-gray-500 mb-2">Sube fotos de tus artículos</p>
             <Button variant="outline" type="button" className="text-sm">
-              Select Photos
+              Seleccionar Fotos
             </Button>
           </div>
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="additional-notes">Additional Notes (Optional)</Label>
+          <Label htmlFor="additional-notes">Notas Adicionales (Opcional)</Label>
           <Textarea 
             id="additional-notes" 
-            placeholder="Any special instructions or requirements"
+            placeholder="Cualquier instrucción o requisito especial"
             rows={2}
           />
         </div>
@@ -236,7 +237,7 @@ const NewService = () => {
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
-          <h1 className="font-semibold">Request a Service</h1>
+          <h1 className="font-semibold">Solicitar un Servicio</h1>
         </div>
       </header>
       
@@ -286,7 +287,7 @@ const NewService = () => {
                 type="submit" 
                 className="w-full bg-move-blue-500 hover:bg-move-blue-600"
               >
-                {step < 3 ? 'Continue' : 'Request Quotes'} 
+                {step < 3 ? 'Continuar' : 'Solicitar Presupuestos'} 
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>

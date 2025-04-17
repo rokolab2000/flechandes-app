@@ -8,10 +8,10 @@ const MobileNavbar = () => {
   const navigate = useNavigate();
   
   const navItems = [
-    { name: 'Home', path: '/', icon: Home },
-    { name: 'Services', path: '/services', icon: Package },
-    { name: 'Track', path: '/track', icon: Map },
-    { name: 'Profile', path: '/profile', icon: User },
+    { name: 'Inicio', path: '/', icon: Home },
+    { name: 'Servicios', path: '/services', icon: Package },
+    { name: 'Rastrear', path: '/track', icon: Map },
+    { name: 'Perfil', path: '/profile', icon: User },
   ];
   
   return (

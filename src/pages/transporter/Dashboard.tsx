@@ -12,42 +12,42 @@ const TransporterDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'available' | 'accepted'>('available');
   
-  // Mock data for services
+  // Datos de ejemplo para servicios
   const availableServices = [
     {
       id: '1',
-      title: 'Apartment Moving',
+      title: 'Mudanza de Apartamento',
       type: 'moving' as const,
       status: 'pending' as const,
       price: 280.00,
-      origin: '123 First Ave, Seattle',
-      destination: '456 Second St, Seattle',
-      date: 'Jun 20, 2024',
+      origin: '123 Primera Ave, Madrid',
+      destination: '456 Segunda Calle, Madrid',
+      date: '20 Jun, 2024',
       time: '10:00 AM'
     },
     {
       id: '2',
-      title: 'Furniture Delivery',
+      title: 'Entrega de Muebles',
       type: 'delivery' as const,
       status: 'pending' as const,
       price: 120.00,
-      origin: 'Furniture Store, Seattle',
-      destination: '789 Third Ave, Seattle',
-      date: 'Jun 25, 2024',
-      time: '01:00 PM'
+      origin: 'Tienda de Muebles, Madrid',
+      destination: '789 Tercera Ave, Madrid',
+      date: '25 Jun, 2024',
+      time: '13:00 PM'
     }
   ];
   
   const acceptedServices = [
     {
       id: '3',
-      title: 'Office Equipment',
+      title: 'Equipamiento de Oficina',
       type: 'freight' as const,
       status: 'confirmed' as const,
       price: 350.00,
-      origin: '101 Business Blvd, Seattle',
-      destination: '202 Commerce St, Seattle',
-      date: 'Jun 18, 2024',
+      origin: '101 Bulevar Empresarial, Madrid',
+      destination: '202 Calle Comercio, Madrid',
+      date: '18 Jun, 2024',
       time: '08:00 AM'
     }
   ];
@@ -71,8 +71,8 @@ const TransporterDashboard = () => {
       <main className="container mx-auto max-w-4xl px-4 py-6 mb-20">
         {/* Welcome Section */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold">Hello, Mike</h1>
-          <p className="text-gray-600">Welcome to your transporter dashboard</p>
+          <h1 className="text-2xl font-bold">Hola, Miguel</h1>
+          <p className="text-gray-600">Bienvenido a tu panel de transportista</p>
         </div>
         
         {/* Search */}
@@ -80,7 +80,7 @@ const TransporterDashboard = () => {
           <div className="relative">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
             <Input 
-              placeholder="Search service requests" 
+              placeholder="Buscar solicitudes de servicio" 
               className="pl-10"
             />
           </div>
@@ -94,7 +94,7 @@ const TransporterDashboard = () => {
                 <TrendingUp className="h-5 w-5 text-move-green-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Your Rating</p>
+                <p className="text-sm text-gray-500">Tu Calificación</p>
                 <p className="text-xl font-semibold">4.9/5</p>
               </div>
             </div>
@@ -106,8 +106,8 @@ const TransporterDashboard = () => {
                 <DollarSign className="h-5 w-5 text-move-blue-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Earnings</p>
-                <p className="text-xl font-semibold">$1,250</p>
+                <p className="text-sm text-gray-500">Ganancias</p>
+                <p className="text-xl font-semibold">€1,250</p>
               </div>
             </div>
           </div>
@@ -118,7 +118,7 @@ const TransporterDashboard = () => {
                 <CheckCircle className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Completed</p>
+                <p className="text-sm text-gray-500">Completados</p>
                 <p className="text-xl font-semibold">12</p>
               </div>
             </div>
@@ -130,7 +130,7 @@ const TransporterDashboard = () => {
                 <Clock className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">In Progress</p>
+                <p className="text-sm text-gray-500">En Progreso</p>
                 <p className="text-xl font-semibold">1</p>
               </div>
             </div>
@@ -149,7 +149,7 @@ const TransporterDashboard = () => {
               }`}
               onClick={() => setActiveTab('available')}
             >
-              Available Jobs
+              Trabajos Disponibles
             </button>
             <button
               className={`flex-1 py-3 px-4 text-center font-medium ${
@@ -159,7 +159,7 @@ const TransporterDashboard = () => {
               }`}
               onClick={() => setActiveTab('accepted')}
             >
-              My Jobs
+              Mis Trabajos
             </button>
           </div>
           
@@ -176,14 +176,14 @@ const TransporterDashboard = () => {
                       />
                       <div className="absolute bottom-4 right-4">
                         <Button className="bg-move-green-500 hover:bg-move-green-600">
-                          Accept Job
+                          Aceptar Trabajo
                         </Button>
                       </div>
                     </div>
                   ))
                 ) : (
                   <div className="col-span-2 py-8 text-center text-gray-500">
-                    No available jobs in your area
+                    No hay trabajos disponibles en tu área
                   </div>
                 )
               ) : (
@@ -197,7 +197,7 @@ const TransporterDashboard = () => {
                   ))
                 ) : (
                   <div className="col-span-2 py-8 text-center text-gray-500">
-                    You haven't accepted any jobs yet
+                    No has aceptado ningún trabajo aún
                   </div>
                 )
               )}

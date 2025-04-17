@@ -1,3 +1,4 @@
+
 import { useNavigate } from 'react-router-dom';
 import { CalendarDays, Truck, Map, Star, Package, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -76,7 +77,7 @@ const Index = () => {
             <div className="absolute inset-0 bg-gradient-to-t from-white to-transparent z-10 pointer-events-none" />
             <img 
               src="https://images.unsplash.com/photo-1600023622007-8b2162dab098?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-              alt="Moving services" 
+              alt="Servicios de mudanza" 
               className="rounded-lg shadow-xl mx-auto max-w-full md:max-w-3xl"
             />
           </div>
@@ -87,7 +88,7 @@ const Index = () => {
       <section className="py-16 px-4 bg-white">
         <div className="container mx-auto max-w-4xl">
           <h2 className="text-2xl font-bold mb-12 text-center">
-            Por qué elegir <span className="text-move-blue-500">Move-It-Easy</span>
+            Por qué elegir <span className="text-move-blue-500">Flechandes</span>
           </h2>
           
           <motion.div 
@@ -118,7 +119,7 @@ const Index = () => {
         <div className="container mx-auto max-w-4xl text-center">
           <h2 className="text-2xl font-bold mb-4">¿Listo para simplificar tu mudanza?</h2>
           <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-            Únete a miles de clientes satisfechos que han hecho su experiencia de mudanza sin estrés con Move-It-Easy.
+            Únete a miles de clientes satisfechos que han hecho su experiencia de mudanza sin estrés con Flechandes.
           </p>
           <Button 
             className="bg-move-blue-500 hover:bg-move-blue-600 text-white font-medium py-2.5 px-6 rounded-lg shadow-md" 
@@ -160,7 +161,7 @@ const Index = () => {
           </div>
           
           <div className="mt-8 text-center text-sm">
-            <p>&copy; {new Date().getFullYear()} Move-It-Easy. Todos los derechos reservados.</p>
+            <p>&copy; {new Date().getFullYear()} Flechandes. Todos los derechos reservados.</p>
           </div>
         </div>
       </footer>

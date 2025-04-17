@@ -38,6 +38,21 @@ const ServiceCard = ({
     'completed': 'bg-green-100 text-green-800',
   };
 
+  // Status translations
+  const statusTranslations = {
+    'pending': 'Pendiente',
+    'confirmed': 'Confirmado',
+    'in-progress': 'En progreso',
+    'completed': 'Completado',
+  };
+
+  // Type translations
+  const typeTranslations = {
+    'moving': 'Mudanza',
+    'delivery': 'Entrega',
+    'freight': 'Carga',
+  };
+
   const typeIcons = {
     'moving': <Package className="h-5 w-5" />,
     'delivery': <Package className="h-5 w-5" />,
@@ -55,13 +70,13 @@ const ServiceCard = ({
       <div className="flex justify-between items-start mb-3">
         <h3 className="font-medium text-lg">{title}</h3>
         <span className={cn('px-2 py-1 rounded-full text-xs font-medium', statusColors[status])}>
-          {status.charAt(0).toUpperCase() + status.slice(1)}
+          {statusTranslations[status]}
         </span>
       </div>
 
       <div className="flex items-center text-gray-600 mb-2 text-sm">
         <Package className="h-4 w-4 mr-2" />
-        <span className="capitalize">{type}</span>
+        <span className="capitalize">{typeTranslations[type]}</span>
       </div>
 
       <div className="flex items-center text-gray-600 mb-2 text-sm">
@@ -81,9 +96,9 @@ const ServiceCard = ({
 
       {price && (
         <div className="flex justify-between items-center mt-4">
-          <span className="text-lg font-semibold text-move-blue-600">${price.toFixed(2)}</span>
+          <span className="text-lg font-semibold text-move-blue-600">€{price.toFixed(2)}</span>
           <Button variant="default" size="sm" className="bg-move-blue-500 hover:bg-move-blue-600">
-            View Details
+            Ver Detalles
           </Button>
         </div>
       )}

@@ -50,12 +50,12 @@ const Login = () => {
   const renderLoginForm = () => (
     <form onSubmit={handleSubmit} className="space-y-4 w-full">
       <div className="space-y-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">Correo electrónico</Label>
         <div className="relative">
           <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
           <Input 
             id="email" 
-            placeholder="Your email address" 
+            placeholder="Tu correo electrónico" 
             type="email" 
             className="pl-10"
           />
@@ -64,16 +64,16 @@ const Login = () => {
       
       <div className="space-y-2">
         <div className="flex justify-between">
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password">Contraseña</Label>
           <a href="#" className="text-xs text-move-blue-600 hover:underline">
-            Forgot password?
+            ¿Olvidaste tu contraseña?
           </a>
         </div>
         <div className="relative">
           <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
           <Input 
             id="password" 
-            placeholder="Your password" 
+            placeholder="Tu contraseña" 
             type="password" 
             className="pl-10"
           />
@@ -81,23 +81,23 @@ const Login = () => {
       </div>
       
       <Button type="submit" className="w-full bg-move-blue-500 hover:bg-move-blue-600">
-        Login
+        Iniciar sesión
       </Button>
       
       <p className="text-center text-sm text-gray-500">
-        Don't have an account?{' '}
+        ¿No tienes una cuenta?{' '}
         <button 
           type="button"
           className="text-move-blue-600 hover:underline font-medium"
           onClick={() => {setIsLogin(false); setStep(1);}}
         >
-          Register
+          Registrarse
         </button>
       </p>
       
       <div className="relative flex items-center justify-center">
         <hr className="w-full border-gray-200" />
-        <span className="absolute bg-white px-2 text-sm text-gray-500">or continue with</span>
+        <span className="absolute bg-white px-2 text-sm text-gray-500">o continuar con</span>
       </div>
       
       <div className="grid grid-cols-2 gap-3">
@@ -117,12 +117,12 @@ const Login = () => {
       
       <form onSubmit={handleSubmit} className="space-y-4 mt-6">
         <div className="space-y-2">
-          <Label htmlFor="register-email">Email</Label>
+          <Label htmlFor="register-email">Correo electrónico</Label>
           <div className="relative">
             <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input 
               id="register-email" 
-              placeholder="Your email address" 
+              placeholder="Tu correo electrónico" 
               type="email" 
               className="pl-10"
             />
@@ -130,12 +130,12 @@ const Login = () => {
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="register-phone">Phone Number</Label>
+          <Label htmlFor="register-phone">Número de teléfono</Label>
           <div className="relative">
             <Phone className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input 
               id="register-phone" 
-              placeholder="Your phone number" 
+              placeholder="Tu número de teléfono" 
               type="tel" 
               className="pl-10"
             />
@@ -143,33 +143,33 @@ const Login = () => {
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="register-password">Create Password</Label>
+          <Label htmlFor="register-password">Crear contraseña</Label>
           <div className="relative">
             <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
             <Input 
               id="register-password" 
-              placeholder="Create a strong password" 
+              placeholder="Crea una contraseña fuerte" 
               type="password" 
               className="pl-10"
             />
           </div>
           <p className="text-xs text-gray-500">
-            Password must be at least 8 characters long
+            La contraseña debe tener al menos 8 caracteres
           </p>
         </div>
         
         <Button type="submit" className="w-full bg-move-blue-500 hover:bg-move-blue-600">
-          {userType === 'transporter' ? 'Next' : 'Register'}
+          {userType === 'transporter' ? 'Siguiente' : 'Registrarse'}
         </Button>
         
         <p className="text-center text-sm text-gray-500">
-          Already have an account?{' '}
+          ¿Ya tienes una cuenta?{' '}
           <button 
             type="button"
             className="text-move-blue-600 hover:underline font-medium"
             onClick={() => {setIsLogin(true); setStep(1);}}
           >
-            Login
+            Iniciar sesión
           </button>
         </p>
       </form>
@@ -186,52 +186,52 @@ const Login = () => {
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
-        <span className="ml-2 font-semibold">Vehicle Information</span>
+        <span className="ml-2 font-semibold">Información del vehículo</span>
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="vehicle-type">Vehicle Type</Label>
+          <Label htmlFor="vehicle-type">Tipo de vehículo</Label>
           <select 
             id="vehicle-type"
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-move-blue-500"
           >
-            <option value="">Select vehicle type</option>
-            <option value="pickup">Pickup Truck</option>
-            <option value="van">Van</option>
-            <option value="truck">Moving Truck</option>
-            <option value="box-truck">Box Truck</option>
+            <option value="">Seleccionar tipo de vehículo</option>
+            <option value="pickup">Camioneta pickup</option>
+            <option value="van">Furgoneta</option>
+            <option value="truck">Camión de mudanza</option>
+            <option value="box-truck">Camión de caja</option>
           </select>
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="license-plate">License Plate</Label>
+          <Label htmlFor="license-plate">Placa del vehículo</Label>
           <Input 
             id="license-plate" 
-            placeholder="Enter license plate number" 
+            placeholder="Ingresa el número de placa" 
           />
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="vehicle-capacity">Vehicle Capacity</Label>
+          <Label htmlFor="vehicle-capacity">Capacidad del vehículo</Label>
           <Input 
             id="vehicle-capacity" 
-            placeholder="Capacity in cubic feet" 
+            placeholder="Capacidad en metros cúbicos" 
             type="number" 
           />
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="vehicle-year">Vehicle Year</Label>
+          <Label htmlFor="vehicle-year">Año del vehículo</Label>
           <Input 
             id="vehicle-year" 
-            placeholder="Year of manufacture" 
+            placeholder="Año de fabricación" 
             type="number" 
           />
         </div>
         
         <Button type="submit" className="w-full bg-move-blue-500 hover:bg-move-blue-600">
-          Next
+          Siguiente
         </Button>
       </form>
     </div>
@@ -247,21 +247,21 @@ const Login = () => {
         >
           <ChevronLeft className="h-5 w-5" />
         </button>
-        <span className="ml-2 font-semibold">Documents Verification</span>
+        <span className="ml-2 font-semibold">Verificación de documentos</span>
       </div>
       
       <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
         <div className="flex">
           <AlertCircle className="h-5 w-5 text-blue-500 mr-2 flex-shrink-0" />
           <p className="text-sm text-blue-700">
-            Please upload the following documents to verify your account. All files must be in PDF or JPG format.
+            Por favor, sube los siguientes documentos para verificar tu cuenta. Todos los archivos deben estar en formato PDF o JPG.
           </p>
         </div>
       </div>
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="driver-license">Driver's License</Label>
+          <Label htmlFor="driver-license">Licencia de conducir</Label>
           <Input 
             id="driver-license" 
             type="file" 
@@ -270,7 +270,7 @@ const Login = () => {
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="insurance">Vehicle Insurance</Label>
+          <Label htmlFor="insurance">Seguro del vehículo</Label>
           <Input 
             id="insurance" 
             type="file" 
@@ -279,7 +279,7 @@ const Login = () => {
         </div>
         
         <div className="space-y-2">
-          <Label htmlFor="business-license">Business License (optional)</Label>
+          <Label htmlFor="business-license">Licencia comercial (opcional)</Label>
           <Input 
             id="business-license" 
             type="file" 
@@ -299,16 +299,16 @@ const Login = () => {
           </div>
           <div className="text-sm">
             <label htmlFor="terms" className="font-medium text-gray-900">
-              I agree to the <a href="#" className="text-move-blue-600 hover:underline">Terms of Service</a> and <a href="#" className="text-move-blue-600 hover:underline">Privacy Policy</a>
+              Acepto los <a href="#" className="text-move-blue-600 hover:underline">Términos de Servicio</a> y la <a href="#" className="text-move-blue-600 hover:underline">Política de Privacidad</a>
             </label>
             <p id="terms" className="text-xs font-normal text-gray-500">
-              By registering, you agree to our background check process.
+              Al registrarte, aceptas nuestro proceso de verificación de antecedentes.
             </p>
           </div>
         </div>
         
         <Button type="submit" className="w-full bg-move-blue-500 hover:bg-move-blue-600">
-          Complete Registration
+          Completar registro
         </Button>
       </form>
     </div>
@@ -344,18 +344,18 @@ const Login = () => {
             <Logo size="lg" className="mx-auto mb-6" />
             <h1 className="text-2xl font-bold">
               {isLogin 
-                ? 'Welcome back' 
+                ? 'Bienvenido de nuevo' 
                 : step === 1 
-                  ? 'Create your account' 
+                  ? 'Crea tu cuenta' 
                   : step === 2 
-                    ? 'Vehicle Information' 
-                    : 'Document Verification'
+                    ? 'Información del vehículo' 
+                    : 'Verificación de documentos'
               }
             </h1>
             <p className="text-gray-600 mt-2">
               {isLogin 
-                ? 'Sign in to access your account' 
-                : 'Complete the form to get started'
+                ? 'Inicia sesión para acceder a tu cuenta' 
+                : 'Completa el formulario para comenzar'
               }
             </p>
           </div>
@@ -377,28 +377,28 @@ const Login = () => {
       <div className="hidden md:block w-1/2 bg-move-blue-500">
         <div className="h-full flex items-center justify-center p-6">
           <div className="max-w-md text-white">
-            <h2 className="text-3xl font-bold mb-4">Moving made simple</h2>
+            <h2 className="text-3xl font-bold mb-4">Mudanzas simplificadas</h2>
             <p className="mb-6">
-              Join our community of transporters and customers for a seamless moving experience.
+              Únete a nuestra comunidad de transportistas y clientes para una experiencia de mudanza sin complicaciones.
             </p>
             <div className="space-y-4">
               <div className="flex items-center">
                 <div className="bg-white/20 rounded-full p-1 mr-3">
                   <Check className="h-5 w-5" />
                 </div>
-                <span>Fast and reliable service</span>
+                <span>Servicio rápido y confiable</span>
               </div>
               <div className="flex items-center">
                 <div className="bg-white/20 rounded-full p-1 mr-3">
                   <Check className="h-5 w-5" />
                 </div>
-                <span>Secure payment processing</span>
+                <span>Procesamiento de pagos seguro</span>
               </div>
               <div className="flex items-center">
                 <div className="bg-white/20 rounded-full p-1 mr-3">
                   <Check className="h-5 w-5" />
                 </div>
-                <span>Real-time tracking</span>
+                <span>Seguimiento en tiempo real</span>
               </div>
             </div>
           </div>

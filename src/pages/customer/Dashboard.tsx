@@ -12,42 +12,42 @@ const CustomerDashboard = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'upcoming' | 'past'>('upcoming');
   
-  // Mock data for services
+  // Datos de ejemplo para servicios
   const upcomingServices = [
     {
       id: '1',
-      title: 'Home Moving',
+      title: 'Mudanza de Casa',
       type: 'moving' as const,
       status: 'confirmed' as const,
       price: 299.99,
-      origin: '123 Main St, Seattle',
-      destination: '456 Park Ave, Seattle',
-      date: 'Jun 15, 2024',
+      origin: '123 Calle Principal, Madrid',
+      destination: '456 Avenida Parque, Madrid',
+      date: '15 Jun, 2024',
       time: '09:00 AM'
     },
     {
       id: '2',
-      title: 'Furniture Delivery',
+      title: 'Entrega de Muebles',
       type: 'delivery' as const,
       status: 'pending' as const,
       price: 89.99,
-      origin: 'IKEA Seattle',
-      destination: '123 Main St, Seattle',
-      date: 'Jun 18, 2024',
-      time: '02:00 PM'
+      origin: 'IKEA Madrid',
+      destination: '123 Calle Principal, Madrid',
+      date: '18 Jun, 2024',
+      time: '14:00 PM'
     }
   ];
   
   const pastServices = [
     {
       id: '3',
-      title: 'Office Moving',
+      title: 'Mudanza de Oficina',
       type: 'moving' as const,
       status: 'completed' as const,
       price: 450.00,
-      origin: '789 Office Blvd, Seattle',
-      destination: '101 Work St, Seattle',
-      date: 'May 22, 2024',
+      origin: '789 Bulevar Oficina, Madrid',
+      destination: '101 Calle Trabajo, Madrid',
+      date: '22 May, 2024',
       time: '08:00 AM'
     }
   ];
@@ -71,8 +71,8 @@ const CustomerDashboard = () => {
       <main className="container mx-auto max-w-4xl px-4 py-6 mb-20">
         {/* Welcome Section */}
         <div className="mb-6">
-          <h1 className="text-2xl font-bold">Hello, John</h1>
-          <p className="text-gray-600">Welcome to your dashboard</p>
+          <h1 className="text-2xl font-bold">Hola, Juan</h1>
+          <p className="text-gray-600">Bienvenido a tu panel de control</p>
         </div>
         
         {/* Search and Create */}
@@ -80,7 +80,7 @@ const CustomerDashboard = () => {
           <div className="relative flex-grow">
             <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
             <Input 
-              placeholder="Search services" 
+              placeholder="Buscar servicios" 
               className="pl-10"
             />
           </div>
@@ -90,7 +90,7 @@ const CustomerDashboard = () => {
             onClick={() => navigate('/customer/new-service')}
           >
             <PlusCircle className="h-4 w-4" />
-            <span>New Service</span>
+            <span>Nuevo Servicio</span>
           </Button>
         </div>
         
@@ -102,7 +102,7 @@ const CustomerDashboard = () => {
                 <Package className="h-5 w-5 text-move-blue-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Total Services</p>
+                <p className="text-sm text-gray-500">Total Servicios</p>
                 <p className="text-xl font-semibold">3</p>
               </div>
             </div>
@@ -114,7 +114,7 @@ const CustomerDashboard = () => {
                 <Clock className="h-5 w-5 text-yellow-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Pending</p>
+                <p className="text-sm text-gray-500">Pendientes</p>
                 <p className="text-xl font-semibold">1</p>
               </div>
             </div>
@@ -126,7 +126,7 @@ const CustomerDashboard = () => {
                 <Calendar className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Upcoming</p>
+                <p className="text-sm text-gray-500">Próximos</p>
                 <p className="text-xl font-semibold">2</p>
               </div>
             </div>
@@ -138,7 +138,7 @@ const CustomerDashboard = () => {
                 <Package className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-500">Completed</p>
+                <p className="text-sm text-gray-500">Completados</p>
                 <p className="text-xl font-semibold">1</p>
               </div>
             </div>
@@ -157,7 +157,7 @@ const CustomerDashboard = () => {
               }`}
               onClick={() => setActiveTab('upcoming')}
             >
-              Upcoming Services
+              Servicios Próximos
             </button>
             <button
               className={`flex-1 py-3 px-4 text-center font-medium ${
@@ -167,7 +167,7 @@ const CustomerDashboard = () => {
               }`}
               onClick={() => setActiveTab('past')}
             >
-              Past Services
+              Servicios Pasados
             </button>
           </div>
           
@@ -185,7 +185,7 @@ const CustomerDashboard = () => {
                   ))
                 ) : (
                   <div className="col-span-2 py-8 text-center text-gray-500">
-                    No upcoming services
+                    No hay servicios próximos
                   </div>
                 )
               ) : (
@@ -199,7 +199,7 @@ const CustomerDashboard = () => {
                   ))
                 ) : (
                   <div className="col-span-2 py-8 text-center text-gray-500">
-                    No past services
+                    No hay servicios pasados
                   </div>
                 )
               )}
