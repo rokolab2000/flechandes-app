@@ -11,23 +11,23 @@ const Index = () => {
   const features = [
     {
       icon: <Truck className="h-8 w-8 text-move-blue-500" />,
-      title: 'Find Reliable Movers',
-      description: 'Connect with verified transporters for all your moving needs'
+      title: 'Encuentra Transportistas Confiables',
+      description: 'Conéctate con transportistas verificados para todas tus necesidades de mudanza'
     },
     {
       icon: <CalendarDays className="h-8 w-8 text-move-blue-500" />,
-      title: 'Book When You Need',
-      description: 'Schedule services at your convenience with real-time availability'
+      title: 'Reserva Cuando Necesites',
+      description: 'Programa servicios a tu conveniencia con disponibilidad en tiempo real'
     },
     {
       icon: <Map className="h-8 w-8 text-move-blue-500" />,
-      title: 'Track Your Move',
-      description: 'Follow your shipment with real-time location updates'
+      title: 'Rastrea Tu Mudanza',
+      description: 'Sigue tu envío con actualizaciones de ubicación en tiempo real'
     },
     {
       icon: <Star className="h-8 w-8 text-move-blue-500" />,
-      title: 'Trusted Reviews',
-      description: 'See ratings and reviews from other customers'
+      title: 'Reseñas Confiables',
+      description: 'Consulta calificaciones y opiniones de otros clientes'
     }
   ];
 
@@ -57,11 +57,11 @@ const Index = () => {
           <Logo size="lg" className="mx-auto mb-6" />
           
           <h1 className="text-4xl font-bold mb-4 text-gray-800">
-            Moving Made <span className="text-move-blue-500">Simple</span>
+            Mudanzas <span className="text-move-blue-500">Simples</span>
           </h1>
           
           <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-            Connect with reliable movers for your delivery and moving needs in just a few clicks.
+            Conéctate con transportistas confiables para tus necesidades de mudanza y envío en solo unos clics.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -69,7 +69,7 @@ const Index = () => {
               className="bg-move-blue-500 hover:bg-move-blue-600 text-white font-medium py-6 px-8 rounded-lg text-lg shadow-lg" 
               onClick={() => navigate('/login')}
             >
-              Get Started <ArrowRight className="ml-2 h-5 w-5" />
+              Comenzar <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
           
@@ -88,7 +88,7 @@ const Index = () => {
       <section className="py-16 px-4 bg-white">
         <div className="container mx-auto max-w-4xl">
           <h2 className="text-2xl font-bold mb-12 text-center">
-            Why Choose <span className="text-move-blue-500">Move-It-Easy</span>
+            Por qué elegir <span className="text-move-blue-500">Move-It-Easy</span>
           </h2>
           
           <motion.div 
@@ -117,15 +117,15 @@ const Index = () => {
       {/* Call to Action */}
       <section className="py-16 px-4 bg-move-blue-50">
         <div className="container mx-auto max-w-4xl text-center">
-          <h2 className="text-2xl font-bold mb-4">Ready to simplify your move?</h2>
+          <h2 className="text-2xl font-bold mb-4">¿Listo para simplificar tu mudanza?</h2>
           <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
-            Join thousands of satisfied customers who have made their moving experience stress-free with Move-It-Easy.
+            Únete a miles de clientes satisfechos que han hecho su experiencia de mudanza sin estrés con Move-It-Easy.
           </p>
           <Button 
             className="bg-move-blue-500 hover:bg-move-blue-600 text-white font-medium py-2.5 px-6 rounded-lg shadow-md" 
             onClick={() => navigate('/login')}
           >
-            Get Started Today
+            Comenzar Hoy
           </Button>
         </div>
       </section>
@@ -136,32 +136,32 @@ const Index = () => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-6 md:mb-0">
               <Logo size="md" className="text-white" />
-              <p className="mt-2 text-sm">Moving solutions at your fingertips</p>
+              <p className="mt-2 text-sm">Soluciones de mudanza en tus manos</p>
             </div>
             
             <div className="flex flex-col md:flex-row gap-8">
               <div>
-                <h4 className="font-semibold mb-2">Company</h4>
+                <h4 className="font-semibold mb-2">Empresa</h4>
                 <ul className="space-y-1 text-sm">
-                  <li>About Us</li>
-                  <li>Careers</li>
-                  <li>Contact</li>
+                  <li>Sobre Nosotros</li>
+                  <li>Carreras</li>
+                  <li>Contacto</li>
                 </ul>
               </div>
               
               <div>
-                <h4 className="font-semibold mb-2">Support</h4>
+                <h4 className="font-semibold mb-2">Soporte</h4>
                 <ul className="space-y-1 text-sm">
-                  <li>Help Center</li>
-                  <li>Safety</li>
-                  <li>Terms of Service</li>
+                  <li>Centro de Ayuda</li>
+                  <li>Seguridad</li>
+                  <li>Términos de Servicio</li>
                 </ul>
               </div>
             </div>
           </div>
           
           <div className="mt-8 text-center text-sm">
-            <p>&copy; {new Date().getFullYear()} Move-It-Easy. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} Move-It-Easy. Todos los derechos reservados.</p>
           </div>
         </div>
       </footer>
