@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Package, Truck, Users, HandHelping } from 'lucide-react';
+import { Truck, Package, Users, HandHelping } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export type UserType = 
@@ -31,69 +31,81 @@ const UserTypeSelector = ({
     {
       id: 'shipping',
       title: 'Usuario de Envíos',
-      description: 'Persona que necesita enviar sus paquetes',
+      description: 'Envía paquetes de manera segura y económica',
       icon: Package,
-      color: 'move-blue'
+      color: 'flechandes-primary'
     },
     {
       id: 'moving',
       title: 'Usuario de Mudanzas',
-      description: 'Persona que necesita cambiar sus pertenencias de lugar',
+      description: 'Planifica y realiza tu mudanza sin complicaciones',
       icon: Users,
-      color: 'move-blue'
+      color: 'flechandes-primary'
     },
     {
       id: 'freight',
       title: 'Usuario de Fletes',
-      description: 'Persona que necesita movilizar objetos de gran formato',
-      icon: Package,
-      color: 'move-blue'
+      description: 'Transporta objetos grandes con seguridad',
+      icon: Truck,
+      color: 'flechandes-primary'
     },
     {
       id: 'driver',
       title: 'Usuario Conductor',
-      description: 'Persona que tiene vehículo y presta servicio de transporte',
+      description: 'Genera ingresos con tu vehículo',
       icon: Truck,
-      color: 'move-green'
+      color: 'flechandes-secondary'
     },
     {
       id: 'helper',
       title: 'Usuario Ayudante',
-      description: 'Persona que ayuda en la mudanza',
+      description: 'Ofrece tu ayuda en mudanzas y gana dinero',
       icon: HandHelping,
-      color: 'move-green'
+      color: 'flechandes-secondary'
     },
     {
       id: 'cleaning',
       title: 'Usuario de Limpieza',
-      description: 'Persona que limpia antes y después de la mudanza',
-      icon: Package, // Replaced Broom with Package icon
-      color: 'move-green'
+      description: 'Ofrece servicios de limpieza pre y post mudanza',
+      icon: Package,
+      color: 'flechandes-secondary'
     }
   ];
   
   return (
-    <div className="flex flex-col space-y-4 w-full">
-      <h2 className="text-xl font-semibold text-center">Soy un...</h2>
+    <div className="flex flex-col space-y-6 w-full max-w-4xl mx-auto">
+      <h2 className="text-2xl md:text-3xl font-semibold text-center text-gray-800">
+        Selecciona tu tipo de usuario
+      </h2>
       
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {userTypes.map((type) => (
           <button
             key={type.id}
             className={cn(
-              'p-4 border-2 rounded-xl flex flex-col items-center justify-center space-y-2 transition-all',
+              'p-6 rounded-xl flex flex-col items-center justify-center space-y-3 transition-all duration-300',
+              'hover:shadow-lg hover:scale-[1.02] transform',
               selected === type.id 
-                ? `border-${type.color}-500 bg-${type.color}-50 text-${type.color}-700` 
-                : `border-gray-200 hover:border-${type.color}-300 hover:bg-${type.color}-50/50`
+                ? `bg-${type.color} text-white shadow-lg` 
+                : `bg-white border-2 border-${type.color} hover:border-opacity-50`
             )}
             onClick={() => handleSelect(type.id as UserType)}
           >
             <type.icon className={cn(
-              'h-10 w-10',
-              selected === type.id ? `text-${type.color}-500` : 'text-gray-400'
+              'h-12 w-12 mb-2',
+              selected === type.id 
+                ? 'text-white' 
+                : `text-${type.color}`
             )} />
-            <span className="font-medium">{type.title}</span>
-            <p className="text-xs text-gray-500">{type.description}</p>
+            <span className="font-semibold text-lg">{type.title}</span>
+            <p className={cn(
+              "text-sm text-center",
+              selected === type.id 
+                ? 'text-white/90' 
+                : 'text-gray-600'
+            )}>
+              {type.description}
+            </p>
           </button>
         ))}
       </div>
