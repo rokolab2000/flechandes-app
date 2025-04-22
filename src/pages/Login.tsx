@@ -13,12 +13,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import Logo from '@/components/Logo';
-import UserTypeSelector from '@/components/UserTypeSelector';
+import UserTypeSelector, { UserType } from '@/components/UserTypeSelector';
 
 const Login = () => {
   const navigate = useNavigate();
   const [isLogin, setIsLogin] = useState(true);
-  const [userType, setUserType] = useState<'customer' | 'transporter'>('customer');
+  const [userType, setUserType] = useState<UserType>('shipping');
   const [step, setStep] = useState(1);
   
   const handleSubmit = (e: React.FormEvent) => {
@@ -27,21 +27,21 @@ const Login = () => {
     // Here we would handle actual authentication
     // For now, just redirect to the dashboard
     if (isLogin) {
-      if (userType === 'customer') {
-        navigate('/customer/dashboard');
-      } else {
+      if (userType === 'driver' || userType === 'helper' || userType === 'cleaning') {
         navigate('/transporter/dashboard');
+      } else {
+        navigate('/customer/dashboard');
       }
     } else {
       // If registering, go to next step or finish
-      if (step < (userType === 'transporter' ? 3 : 2)) {
+      if (step < (userType === 'driver' || userType === 'helper' || userType === 'cleaning' ? 3 : 2)) {
         setStep(step + 1);
       } else {
         // Registration complete, redirect to dashboard
-        if (userType === 'customer') {
-          navigate('/customer/dashboard');
-        } else {
+        if (userType === 'driver' || userType === 'helper' || userType === 'cleaning') {
           navigate('/transporter/dashboard');
+        } else {
+          navigate('/customer/dashboard');
         }
       }
     }
@@ -159,7 +159,7 @@ const Login = () => {
         </div>
         
         <Button type="submit" className="w-full bg-move-blue-500 hover:bg-move-blue-600">
-          {userType === 'transporter' ? 'Siguiente' : 'Registrarse'}
+          {userType === 'driver' || userType === 'helper' || userType === 'cleaning' ? 'Siguiente' : 'Registrarse'}
         </Button>
         
         <p className="text-center text-sm text-gray-500">
@@ -315,9 +315,9 @@ const Login = () => {
   );
   
   const renderStepIndicator = () => {
-    if (isLogin || (userType === 'customer' && step === 1)) return null;
+    if (isLogin || (userType !== 'driver' && userType !== 'helper' && userType !== 'cleaning' && step === 1)) return null;
     
-    const totalSteps = userType === 'transporter' ? 3 : 2;
+    const totalSteps = userType === 'driver' || userType === 'helper' || userType === 'cleaning' ? 3 : 2;
     
     return (
       <div className="flex items-center justify-center space-x-2 mb-6">
