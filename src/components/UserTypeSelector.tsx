@@ -1,5 +1,6 @@
+
 import { useState } from 'react';
-import { Package, Truck, Users, HandHelping, Broom } from 'lucide-react';
+import { Package, Truck, Users, HandHelping } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export type UserType = 
@@ -66,7 +67,7 @@ const UserTypeSelector = ({
       id: 'cleaning',
       title: 'Usuario de Limpieza',
       description: 'Persona que limpia antes y después de la mudanza',
-      icon: Broom,
+      icon: Package, // Replaced Broom with Package icon
       color: 'move-green'
     }
   ];
