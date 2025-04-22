@@ -1,9 +1,9 @@
-
 import { useNavigate } from 'react-router-dom';
 import { CalendarDays, Truck, Map, Star, Package, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
+import ServicesSection from '@/components/ServicesSection';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -83,6 +83,9 @@ const Index = () => {
           </div>
         </div>
       </section>
+
+      {/* Services Section */}
+      <ServicesSection />
 
       {/* Features Section */}
       <section className="py-16 px-4 bg-white">
