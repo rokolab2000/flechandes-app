@@ -1,5 +1,5 @@
+
 import React from 'react';
-import { ArrowRightLeft } from 'lucide-react';
 import { useState } from 'react';
 import { Mail, Lock, Phone, User, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -22,37 +22,15 @@ const RegisterStep1 = ({
 }: RegisterStep1Props) => {
   const [showPassword, setShowPassword] = useState(false);
   
+  // Determinar si el usuario es "cliente" (los tres primeros) o "transportista" (los tres siguientes)
+  const isCliente = ['shipping', 'moving', 'freight'].includes(userType);
+  const isTransportista = ['driver', 'helper', 'cleaning'].includes(userType);
+
   return (
     <div className="space-y-6 w-full">
       <div className="space-y-4">
         <h3 className="text-lg font-semibold text-gray-700">Tipo de usuario</h3>
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            type="button"
-            className={`p-4 rounded-lg border-2 flex flex-col items-center text-center ${
-              ['shipping', 'moving', 'freight'].includes(userType) 
-                ? 'bg-[#009EE2] text-white border-[#009EE2]' 
-                : 'bg-white text-gray-700 border-gray-200 hover:border-[#009EE2]/50'
-            }`}
-            onClick={() => onUserTypeSelect('shipping')}
-          >
-            <User className={`h-6 w-6 mb-2 ${['shipping', 'moving', 'freight'].includes(userType) ? 'text-white' : 'text-[#009EE2]'}`} />
-            <span className="text-sm font-medium">Cliente</span>
-          </button>
-          
-          <button
-            type="button"
-            className={`p-4 rounded-lg border-2 flex flex-col items-center text-center ${
-              ['driver', 'helper', 'cleaning'].includes(userType) 
-                ? 'bg-[#DB2851] text-white border-[#DB2851]' 
-                : 'bg-white text-gray-700 border-gray-200 hover:border-[#DB2851]/50'
-            }`}
-            onClick={() => onUserTypeSelect('driver')}
-          >
-            <ArrowRightLeft className={`h-6 w-6 mb-2 ${['driver', 'helper', 'cleaning'].includes(userType) ? 'text-white' : 'text-[#DB2851]'}`} />
-            <span className="text-sm font-medium">Transportista</span>
-          </button>
-        </div>
+        <UserTypeSelector onSelect={onUserTypeSelect} defaultSelected={userType} />
       </div>
       
       <form onSubmit={onSubmit} className="space-y-4 mt-6">
@@ -138,9 +116,9 @@ const RegisterStep1 = ({
         
         <Button 
           type="submit" 
-          className={`w-full ${['driver', 'helper', 'cleaning'].includes(userType) ? 'bg-[#DB2851] hover:bg-[#c11f45]' : 'bg-[#009EE2] hover:bg-[#007bb3]'} py-2.5 text-base`}
+          className={`w-full ${isTransportista ? 'bg-[#DB2851] hover:bg-[#c11f45]' : 'bg-[#009EE2] hover:bg-[#007bb3]'} py-2.5 text-base`}
         >
-          {userType === 'driver' || userType === 'helper' || userType === 'cleaning' ? 'Siguiente' : 'Registrarse'}
+          {isTransportista ? 'Siguiente' : 'Registrarse'}
         </Button>
         
         <p className="text-center text-sm text-gray-600 pt-2">
