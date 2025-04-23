@@ -1,5 +1,5 @@
 
-import { ArrowRightLeft } from 'lucide-react';
+import React from 'react';
 import { cn } from '@/lib/utils';
 
 interface LogoProps {
@@ -9,20 +9,17 @@ interface LogoProps {
 
 const Logo = ({ size = 'md', className }: LogoProps) => {
   const sizeClasses = {
-    sm: 'text-xl',
-    md: 'text-2xl',
-    lg: 'text-3xl',
+    sm: 'w-24',
+    md: 'w-32',
+    lg: 'w-48',
   };
   
   return (
-    <div className={cn('flex items-center gap-2 font-bold font-halvar', sizeClasses[size], className)}>
-      <div className="rounded-md p-1 bg-gradient-to-r from-[#DB2851] to-[#009EE2]">
-        <ArrowRightLeft className="text-white" />
-      </div>
-      <span className="bg-gradient-to-r from-[#DB2851] to-[#009EE2] text-transparent bg-clip-text">
-        Flechandes
-      </span>
-    </div>
+    <img 
+      src="/lovable-uploads/5c43d143-230f-42ac-8335-8f38b3b809c2.png" 
+      alt="Flechandes Logo" 
+      className={cn(sizeClasses[size], className)}
+    />
   );
 };
 
