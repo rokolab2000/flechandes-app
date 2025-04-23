@@ -16,7 +16,9 @@ const Logo = ({ size = 'md', className }: LogoProps) => {
   
   return (
     <div className={cn('flex items-center gap-2 font-bold font-halvar', sizeClasses[size], className)}>
-      <Truck className="text-[#009EE2]" />
+      <div className="rounded-md p-1 bg-gradient-to-r from-[#DB2851] to-[#009EE2]">
+        <Truck className="text-white" />
+      </div>
       <span className="bg-gradient-to-r from-[#DB2851] to-[#009EE2] text-transparent bg-clip-text">
         Flechandes
       </span>

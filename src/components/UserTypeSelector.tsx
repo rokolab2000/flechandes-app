@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Truck, Package, Users, HandHelping } from 'lucide-react';
+import { Truck, Package, Users, Wrench } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export type UserType = 
@@ -31,83 +31,85 @@ const UserTypeSelector = ({
     {
       id: 'shipping',
       title: 'Usuario de Envíos',
-      description: 'Envía paquetes de manera segura y económica',
+      description: 'Envía paquetes de manera segura',
       icon: Package,
-      color: 'flechandes-primary'
+      color: 'flechandes-secondary'
     },
     {
       id: 'moving',
       title: 'Usuario de Mudanzas',
-      description: 'Planifica y realiza tu mudanza sin complicaciones',
+      description: 'Planifica y realiza tu mudanza',
       icon: Users,
-      color: 'flechandes-primary'
+      color: 'flechandes-secondary'
     },
     {
       id: 'freight',
       title: 'Usuario de Fletes',
-      description: 'Transporta objetos grandes con seguridad',
+      description: 'Transporta objetos grandes',
       icon: Truck,
-      color: 'flechandes-primary'
+      color: 'flechandes-secondary'
     },
     {
       id: 'driver',
       title: 'Usuario Conductor',
       description: 'Genera ingresos con tu vehículo',
       icon: Truck,
-      color: 'flechandes-secondary'
+      color: 'flechandes-primary'
     },
     {
       id: 'helper',
       title: 'Usuario Ayudante',
-      description: 'Ofrece tu ayuda en mudanzas y gana dinero',
-      icon: HandHelping,
-      color: 'flechandes-secondary'
+      description: 'Ofrece tu ayuda en mudanzas',
+      icon: Wrench,
+      color: 'flechandes-primary'
     },
     {
       id: 'cleaning',
       title: 'Usuario de Limpieza',
-      description: 'Ofrece servicios de limpieza pre y post mudanza',
+      description: 'Ofrece servicios de limpieza',
       icon: Package,
-      color: 'flechandes-secondary'
+      color: 'flechandes-primary'
     }
   ];
   
   return (
-    <div className="flex flex-col space-y-6 w-full max-w-4xl mx-auto">
-      <h2 className="text-2xl md:text-3xl font-semibold text-center text-gray-800">
-        Selecciona tu tipo de usuario
-      </h2>
-      
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {userTypes.map((type) => (
-          <button
-            key={type.id}
-            className={cn(
-              'p-6 rounded-xl flex flex-col items-center justify-center space-y-3 transition-all duration-300',
-              'hover:shadow-lg hover:scale-[1.02] transform',
-              selected === type.id 
-                ? `bg-${type.color} text-white shadow-lg` 
-                : `bg-white border-2 border-${type.color} hover:border-opacity-50`
-            )}
-            onClick={() => handleSelect(type.id as UserType)}
-          >
-            <type.icon className={cn(
-              'h-12 w-12 mb-2',
-              selected === type.id 
-                ? 'text-white' 
-                : `text-${type.color}`
-            )} />
-            <span className="font-semibold text-lg">{type.title}</span>
-            <p className={cn(
-              "text-sm text-center",
-              selected === type.id 
-                ? 'text-white/90' 
-                : 'text-gray-600'
-            )}>
-              {type.description}
-            </p>
-          </button>
-        ))}
+    <div className="flex flex-col space-y-6 w-full">
+      <div className="grid grid-cols-2 gap-3">
+        <button
+          className={cn(
+            'p-4 rounded-lg border-2 flex flex-col items-center text-center',
+            selected === 'shipping' || selected === 'moving' || selected === 'freight'
+              ? 'bg-[#009EE2] text-white border-[#009EE2]'
+              : 'bg-white text-gray-700 border-gray-200 hover:border-[#009EE2]/50'
+          )}
+          onClick={() => handleSelect('shipping')}
+        >
+          <Users className={cn(
+            'h-6 w-6 mb-2',
+            selected === 'shipping' || selected === 'moving' || selected === 'freight'
+              ? 'text-white'
+              : 'text-[#009EE2]'
+          )} />
+          <span className="font-medium">Cliente</span>
+        </button>
+
+        <button
+          className={cn(
+            'p-4 rounded-lg border-2 flex flex-col items-center text-center',
+            selected === 'driver' || selected === 'helper' || selected === 'cleaning'
+              ? 'bg-[#DB2851] text-white border-[#DB2851]'
+              : 'bg-white text-gray-700 border-gray-200 hover:border-[#DB2851]/50'
+          )}
+          onClick={() => handleSelect('driver')}
+        >
+          <Truck className={cn(
+            'h-6 w-6 mb-2',
+            selected === 'driver' || selected === 'helper' || selected === 'cleaning'
+              ? 'text-white'
+              : 'text-[#DB2851]'
+          )} />
+          <span className="font-medium">Transportista</span>
+        </button>
       </div>
     </div>
   );
