@@ -1,5 +1,5 @@
 
-import { Truck } from 'lucide-react';
+import { ArrowRightLeft } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface LogoProps {
@@ -17,7 +17,7 @@ const Logo = ({ size = 'md', className }: LogoProps) => {
   return (
     <div className={cn('flex items-center gap-2 font-bold font-halvar', sizeClasses[size], className)}>
       <div className="rounded-md p-1 bg-gradient-to-r from-[#DB2851] to-[#009EE2]">
-        <Truck className="text-white" />
+        <ArrowRightLeft className="text-white" />
       </div>
       <span className="bg-gradient-to-r from-[#DB2851] to-[#009EE2] text-transparent bg-clip-text">
         Flechandes

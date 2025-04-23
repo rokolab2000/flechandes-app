@@ -1,10 +1,11 @@
-
+import React from 'react';
+import { ArrowRightLeft } from 'lucide-react';
 import { useState } from 'react';
 import { Mail, Lock, Phone, User, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import UserTypeSelector, { UserType } from '@/components/UserTypeSelector';
+import UserTypeSelector, { UserType } from '../UserTypeSelector';
 
 interface RegisterStep1Props {
   userType: UserType;
@@ -48,7 +49,7 @@ const RegisterStep1 = ({
             }`}
             onClick={() => onUserTypeSelect('driver')}
           >
-            <Truck className={`h-6 w-6 mb-2 ${['driver', 'helper', 'cleaning'].includes(userType) ? 'text-white' : 'text-[#DB2851]'}`} />
+            <ArrowRightLeft className={`h-6 w-6 mb-2 ${['driver', 'helper', 'cleaning'].includes(userType) ? 'text-white' : 'text-[#DB2851]'}`} />
             <span className="text-sm font-medium">Transportista</span>
           </button>
         </div>
