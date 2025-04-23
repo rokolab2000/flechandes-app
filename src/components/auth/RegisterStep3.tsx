@@ -1,5 +1,5 @@
 
-import { ChevronLeft, AlertCircle, Upload } from 'lucide-react';
+import { ChevronLeft, AlertCircle, Upload, Truck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -22,7 +22,13 @@ const RegisterStep3 = ({ onBack, onSubmit }: RegisterStep3Props) => {
         </button>
         <span className="ml-2 font-medium text-gray-700">Verificación de documentos</span>
       </div>
-      
+      {/* info específica para chofer */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-3 flex items-center">
+        <Truck className="h-6 w-6 text-blue-500 mr-2" />
+        <p className="text-sm text-blue-700">
+          Sube tus documentos para finalizar tu registro como transportista/chofer. La validación es necesaria para activar tu cuenta.
+        </p>
+      </div>
       <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
         <div className="flex">
           <AlertCircle className="h-5 w-5 text-blue-500 mr-2 flex-shrink-0" />

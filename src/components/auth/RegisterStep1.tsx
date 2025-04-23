@@ -1,6 +1,5 @@
 
-import React from 'react';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Mail, Lock, Phone, User, Eye, EyeOff } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,15 +20,23 @@ const RegisterStep1 = ({
   onToggleForm 
 }: RegisterStep1Props) => {
   const [showPassword, setShowPassword] = useState(false);
-  
-  // Determinar si el usuario es "cliente" (los tres primeros) o "transportista" (los tres siguientes)
   const isCliente = ['shipping', 'moving', 'freight'].includes(userType);
   const isTransportista = ['driver', 'helper', 'cleaning'].includes(userType);
+
+  // Mensaje específico para chofer al iniciar registro
+  const driverIntro = (
+    <div className="p-3 bg-blue-50 border border-blue-200 text-blue-700 text-sm rounded mb-2">
+      Ingresa tus datos para comenzar tu registro como transportista. Luego deberás completar información adicional y verificar tus documentos.
+    </div>
+  );
 
   return (
     <div className="space-y-6 w-full">
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-700">Tipo de usuario</h3>
+        <h3 className="text-lg font-semibold text-gray-700">
+          {isTransportista ? 'Registro de chofer' : 'Tipo de usuario'}
+        </h3>
+        {isTransportista && driverIntro}
         <UserTypeSelector onSelect={onUserTypeSelect} defaultSelected={userType} />
       </div>
       
