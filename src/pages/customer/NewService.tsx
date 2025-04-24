@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
@@ -25,6 +24,7 @@ import { Separator } from '@/components/ui/separator';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import DeliveryTable from '@/components/DeliveryTable';
 
 const NewService = () => {
   const navigate = useNavigate();
@@ -251,7 +251,7 @@ const NewService = () => {
         <p className="text-gray-600">Información para enviar productos a diferentes direcciones</p>
       </div>
       
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div className="space-y-2">
           <Label htmlFor="pickup-address">Dirección de Recogida (Almacén/Tienda)</Label>
           <div className="relative">
@@ -263,66 +263,56 @@ const NewService = () => {
             />
           </div>
         </div>
-        
+
         <div className="space-y-2">
-          <Label>Tipo de Programación</Label>
-          <RadioGroup defaultValue="same-day" className="grid grid-cols-2 gap-4">
-            <div className="flex items-center border rounded-lg p-3">
-              <RadioGroupItem value="same-day" id="same-day" className="mr-2" />
-              <Label htmlFor="same-day">Mismo día</Label>
-            </div>
-            <div className="flex items-center border rounded-lg p-3">
-              <RadioGroupItem value="schedule" id="schedule" className="mr-2" />
-              <Label htmlFor="schedule">Programar entregas</Label>
-            </div>
-          </RadioGroup>
+          <Label htmlFor="pickup-date">Fecha de Recolección</Label>
+          <div className="relative">
+            <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+            <Input 
+              id="pickup-date" 
+              type="date"
+              className="pl-10"
+            />
+          </div>
         </div>
-        
-        <Collapsible className="border rounded-lg p-4">
-          <CollapsibleTrigger className="flex w-full justify-between items-center">
-            <span className="font-medium">Agregar dirección de entrega</span>
-            <Button variant="outline" type="button" size="sm">Agregar</Button>
-          </CollapsibleTrigger>
-          <CollapsibleContent className="mt-4 space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="delivery-address">Dirección de Entrega #1</Label>
-              <div className="relative">
-                <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input 
-                  id="delivery-address" 
-                  placeholder="Ingresa la dirección de entrega" 
-                  className="pl-10"
-                />
+
+        <Separator className="my-4" />
+
+        <div className="space-y-4">
+          <h3 className="font-medium">Lista de Productos y Entregas</h3>
+          <DeliveryTable />
+        </div>
+
+        <div className="border rounded-lg p-4">
+          <div className="flex justify-between items-center">
+            <div className="flex items-center">
+              <Shield className="h-5 w-5 mr-2 text-move-blue-500" />
+              <div>
+                <Label className="font-medium">Seguro de Envío</Label>
+                <p className="text-sm text-gray-600">Protege tus productos durante el transporte</p>
               </div>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="delivery-date">Fecha</Label>
-                <div className="relative">
-                  <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input 
-                    id="delivery-date" 
-                    type="date"
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="delivery-time">Hora</Label>
-                <div className="relative">
-                  <Clock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                  <Input 
-                    id="delivery-time" 
-                    type="time"
-                    className="pl-10"
-                  />
-                </div>
-              </div>
+            <div className="flex items-center">
+              <input 
+                type="checkbox" 
+                id="insurance" 
+                className="mr-2" 
+                checked={insurance} 
+                onChange={() => setInsurance(!insurance)} 
+              />
+              <Label htmlFor="insurance">{insurance ? 'Incluido' : 'No incluido'}</Label>
             </div>
-          </CollapsibleContent>
-        </Collapsible>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="additional-notes">Notas Adicionales (Opcional)</Label>
+          <Textarea 
+            id="additional-notes" 
+            placeholder="Cualquier instrucción o requisito especial"
+            rows={2}
+          />
+        </div>
       </div>
     </>
   );
@@ -762,4 +752,3 @@ const NewService = () => {
 };
 
 export default NewService;
-
