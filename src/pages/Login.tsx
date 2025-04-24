@@ -95,9 +95,78 @@ const Login = () => {
     }
   };
 
+  const renderTransporterBanner = () => (
+    <div className="max-w-md text-white">
+      <h2 className="text-3xl font-bold mb-6">Únete a nuestra red de transportistas</h2>
+      <p className="mb-8 text-lg">
+        Forma parte de la comunidad de transportistas profesionales y accede a nuevas oportunidades de trabajo.
+      </p>
+      <div className="space-y-6">
+        <div className="flex items-center">
+          <div className="bg-white/20 rounded-full p-1 mr-4">
+            <Check className="h-5 w-5" />
+          </div>
+          <span className="text-lg">Recibe solicitudes de servicios</span>
+        </div>
+        <div className="flex items-center">
+          <div className="bg-white/20 rounded-full p-1 mr-4">
+            <Check className="h-5 w-5" />
+          </div>
+          <span className="text-lg">Pagos seguros y puntuales</span>
+        </div>
+        <div className="flex items-center">
+          <div className="bg-white/20 rounded-full p-1 mr-4">
+            <Check className="h-5 w-5" />
+          </div>
+          <span className="text-lg">Flexibilidad de horarios</span>
+        </div>
+        <div className="flex items-center">
+          <div className="bg-white/20 rounded-full p-1 mr-4">
+            <Check className="h-5 w-5" />
+          </div>
+          <span className="text-lg">Soporte personalizado 24/7</span>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderClientBanner = () => (
+    <div className="max-w-md text-white">
+      <h2 className="text-3xl font-bold mb-6">Mudanzas simplificadas</h2>
+      <p className="mb-8 text-lg">
+        Conectamos a transportistas profesionales con clientes que necesitan servicios de mudanza y fletes.
+      </p>
+      <div className="space-y-6">
+        <div className="flex items-center">
+          <div className="bg-white/20 rounded-full p-1 mr-4">
+            <Check className="h-5 w-5" />
+          </div>
+          <span className="text-lg">Servicio rápido y confiable</span>
+        </div>
+        <div className="flex items-center">
+          <div className="bg-white/20 rounded-full p-1 mr-4">
+            <Check className="h-5 w-5" />
+          </div>
+          <span className="text-lg">Procesamiento de pagos seguro</span>
+        </div>
+        <div className="flex items-center">
+          <div className="bg-white/20 rounded-full p-1 mr-4">
+            <Check className="h-5 w-5" />
+          </div>
+          <span className="text-lg">Transportistas verificados</span>
+        </div>
+        <div className="flex items-center">
+          <div className="bg-white/20 rounded-full p-1 mr-4">
+            <Check className="h-5 w-5" />
+          </div>
+          <span className="text-lg">Seguimiento en tiempo real</span>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-gray-50">
-      {/* Header for mobile */}
       <div className="md:hidden p-4 flex items-center justify-between bg-white shadow-sm">
         <Link to="/" className="flex items-center text-gray-700">
           <ArrowLeft className="h-5 w-5 mr-2" />
@@ -106,7 +175,6 @@ const Login = () => {
         <Logo size="sm" />
       </div>
 
-      {/* Left Panel - Form */}
       <div className="w-full md:w-1/2 p-6 flex flex-col justify-center items-center">
         <div className="w-full max-w-md">
           <div className="hidden md:block mb-8">
@@ -139,41 +207,12 @@ const Login = () => {
         </div>
       </div>
       
-      {/* Right Panel - Image */}
       <div className="hidden md:block w-1/2 bg-gradient-to-br from-[#009EE2] to-[#007bb3]">
         <div className="h-full flex items-center justify-center p-6">
-          <div className="max-w-md text-white">
-            <h2 className="text-3xl font-bold mb-6">Mudanzas simplificadas</h2>
-            <p className="mb-8 text-lg">
-              Conectamos a transportistas profesionales con clientes que necesitan servicios de mudanza y fletes.
-            </p>
-            <div className="space-y-6">
-              <div className="flex items-center">
-                <div className="bg-white/20 rounded-full p-1 mr-4">
-                  <Check className="h-5 w-5" />
-                </div>
-                <span className="text-lg">Servicio rápido y confiable</span>
-              </div>
-              <div className="flex items-center">
-                <div className="bg-white/20 rounded-full p-1 mr-4">
-                  <Check className="h-5 w-5" />
-                </div>
-                <span className="text-lg">Procesamiento de pagos seguro</span>
-              </div>
-              <div className="flex items-center">
-                <div className="bg-white/20 rounded-full p-1 mr-4">
-                  <Check className="h-5 w-5" />
-                </div>
-                <span className="text-lg">Transportistas verificados</span>
-              </div>
-              <div className="flex items-center">
-                <div className="bg-white/20 rounded-full p-1 mr-4">
-                  <Check className="h-5 w-5" />
-                </div>
-                <span className="text-lg">Seguimiento en tiempo real</span>
-              </div>
-            </div>
-          </div>
+          {(!isLogin && (userType === 'driver' || userType === 'helper' || userType === 'cleaning'))
+            ? renderTransporterBanner()
+            : renderClientBanner()
+          }
         </div>
       </div>
     </div>
