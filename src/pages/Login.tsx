@@ -1,6 +1,5 @@
-
-import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Check, ArrowLeft } from 'lucide-react';
 import Logo from '@/components/Logo';
 import LoginForm from '@/components/auth/LoginForm';
@@ -13,10 +12,21 @@ import { Button } from '@/components/ui/button';
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isLogin, setIsLogin] = useState(true);
   const [userType, setUserType] = useState<UserType>('shipping');
   const [step, setStep] = useState(1);
   
+  useEffect(() => {
+    const state = location.state as { userType?: UserType; isRegistering?: boolean } | null;
+    if (state?.userType) {
+      setUserType(state.userType);
+    }
+    if (state?.isRegistering) {
+      setIsLogin(false);
+    }
+  }, [location]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     

@@ -9,6 +9,10 @@ import TestimonialsSection from '@/components/TestimonialsSection';
 const Index = () => {
   const navigate = useNavigate();
 
+  const handleDriverRegistration = () => {
+    navigate('/login', { state: { userType: 'driver', isRegistering: true } });
+  };
+
   const features = [
     {
       icon: <Truck className="h-8 w-8 text-[#009EE2]" />,
@@ -198,7 +202,7 @@ const Index = () => {
       {/* Testimonials Section */}
       <TestimonialsSection />
 
-      {/* Nueva sección de CTA para choferes */}
+      {/* CTA para choferes */}
       <section className="py-16 px-4 bg-gradient-to-br from-[#009EE2]/10 to-[#009EE2]/20">
         <div className="container mx-auto max-w-4xl text-center">
           <div className="bg-white rounded-xl shadow-lg p-8 md:p-12 space-y-6 border border-[#009EE2]/10">
@@ -215,14 +219,14 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 className="bg-[#DB2851] hover:bg-[#c11f45] text-white py-3 px-8" 
-                onClick={() => navigate('/login')}
+                onClick={handleDriverRegistration}
               >
                 Registrarse como Chofer
               </Button>
               <Button
                 variant="outline"
                 className="border-[#009EE2] text-[#009EE2] hover:bg-[#009EE2]/10 py-3 px-8"
-                onClick={() => navigate('/login')}
+                onClick={handleDriverRegistration}
               >
                 Cómo funciona
               </Button>
