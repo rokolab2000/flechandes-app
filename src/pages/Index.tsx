@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { CalendarDays, Truck, Map, Star, Shield, Clock, ArrowRight, CheckCircle } from 'lucide-react';
+import { CalendarDays, Truck, Map, Star, Shield, Clock, ArrowRight, CheckCircle, Users, Facebook, Instagram, Twitter, Linkedin } from 'lucide-react';
 import { motion } from 'framer-motion';
 import Logo from '@/components/Logo';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,10 @@ import TestimonialsSection from '@/components/TestimonialsSection';
 
 const Index = () => {
   const navigate = useNavigate();
+
+  const handleClientRegistration = () => {
+    navigate('/login', { state: { userType: 'shipping', isRegistering: true } });
+  };
 
   const handleDriverRegistration = () => {
     navigate('/login', { state: { userType: 'driver', isRegistering: true } });
@@ -57,9 +61,9 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col font-halvar">
       {/* Header/Nav */}
-      <header className="bg-white py-4 px-6 md:px-12 shadow-sm">
+      <header className="bg-white py-6 px-6 md:px-12 shadow-sm sticky top-0 z-50">
         <div className="container mx-auto flex justify-between items-center">
-          <Logo size="md" className="mx-auto md:mx-0" />
+          <Logo size="lg" className="mx-auto md:mx-0" />
           
           <nav className="hidden md:flex items-center gap-8">
             <a href="#servicios" className="text-gray-700 hover:text-[#DB2851] transition-colors">Servicios</a>
@@ -96,12 +100,22 @@ const Index = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-              <Button 
-                className="bg-[#DB2851] hover:bg-[#c11f45] text-white font-medium py-6 px-8 rounded-lg text-lg shadow-lg" 
-                onClick={() => navigate('/login')}
-              >
-                Empezar ahora <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
+              <div className="grid grid-cols-2 gap-4 w-full sm:w-auto">
+                <Button 
+                  className="bg-[#DB2851] hover:bg-[#c11f45] text-white py-6 px-8 rounded-lg text-lg shadow-lg flex flex-col items-center gap-2" 
+                  onClick={handleClientRegistration}
+                >
+                  <Users className="h-6 w-6" />
+                  Cliente
+                </Button>
+                <Button 
+                  className="bg-[#009EE2] hover:bg-[#0080B9] text-white py-6 px-8 rounded-lg text-lg shadow-lg flex flex-col items-center gap-2" 
+                  onClick={handleDriverRegistration}
+                >
+                  <Truck className="h-6 w-6" />
+                  Transportista
+                </Button>
+              </div>
             </div>
           </div>
           
@@ -269,7 +283,7 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-800 text-gray-300 py-12 px-4 mt-auto">
+      <footer className="bg-[#009EE2] text-white py-12 px-4 mt-auto">
         <div className="container mx-auto max-w-6xl">
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 mb-8">
             <div>
@@ -307,20 +321,20 @@ const Index = () => {
             </div>
           </div>
           
-          <div className="border-t border-gray-700 pt-8 mt-8 text-center text-sm">
+          <div className="border-t border-white/20 pt-8 mt-8 text-center text-sm">
             <p>&copy; {new Date().getFullYear()} Flechandes. Todos los derechos reservados.</p>
             <div className="flex justify-center gap-4 mt-4">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                Facebook
+              <a href="#" className="text-white/80 hover:text-white transition-colors">
+                <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                Instagram
+              <a href="#" className="text-white/80 hover:text-white transition-colors">
+                <Instagram className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                Twitter
+              <a href="#" className="text-white/80 hover:text-white transition-colors">
+                <Twitter className="h-5 w-5" />
               </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                LinkedIn
+              <a href="#" className="text-white/80 hover:text-white transition-colors">
+                <Linkedin className="h-5 w-5" />
               </a>
             </div>
           </div>
