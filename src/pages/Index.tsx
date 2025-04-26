@@ -60,7 +60,6 @@ const Index = () => {
 
   return (
     <div className="min-h-screen flex flex-col font-halvar">
-      {/* Header/Nav */}
       <header className="bg-white py-6 px-6 md:px-12 shadow-sm sticky top-0 z-50">
         <div className="container mx-auto flex justify-between items-center">
           <Logo size="lg" className="mx-auto md:mx-0" />
@@ -87,7 +86,6 @@ const Index = () => {
         </div>
       </header>
       
-      {/* Hero Section */}
       <section className="relative bg-gradient-to-b from-white to-[#f5f5f5] py-16 md:py-24 px-4">
         <div className="container mx-auto max-w-6xl flex flex-col md:flex-row items-center">
           <div className="w-full md:w-1/2 text-center md:text-left mb-10 md:mb-0">
@@ -102,17 +100,17 @@ const Index = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
               <div className="grid grid-cols-2 gap-4 w-full sm:w-auto">
                 <Button 
-                  className="bg-[#DB2851] hover:bg-[#c11f45] text-white py-6 px-8 rounded-lg text-lg shadow-lg flex flex-col items-center gap-2" 
+                  className="bg-[#DB2851] hover:bg-[#c11f45] text-white py-6 px-8 rounded-lg text-lg shadow-lg flex items-center gap-2" 
                   onClick={handleClientRegistration}
                 >
-                  <Users className="h-6 w-6" />
+                  <Users className="h-6 w-6 mr-2" />
                   Cliente
                 </Button>
                 <Button 
-                  className="bg-[#009EE2] hover:bg-[#0080B9] text-white py-6 px-8 rounded-lg text-lg shadow-lg flex flex-col items-center gap-2" 
+                  className="bg-[#009EE2] hover:bg-[#0080B9] text-white py-6 px-8 rounded-lg text-lg shadow-lg flex items-center gap-2" 
                   onClick={handleDriverRegistration}
                 >
-                  <Truck className="h-6 w-6" />
+                  <Truck className="h-6 w-6 mr-2" />
                   Transportista
                 </Button>
               </div>
@@ -137,10 +135,8 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Services Section */}
       <ServicesSection />
 
-      {/* How It Works Section */}
       <section className="py-16 px-4 bg-[#f5f5f5]" id="como-funciona">
         <div className="container mx-auto max-w-6xl">
           <div className="text-center mb-12">
@@ -191,7 +187,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Features Section */}
       <section className="py-16 px-4 bg-white" id="caracteristicas">
         <div className="container mx-auto max-w-6xl">
           <h2 className="text-3xl font-bold mb-12 text-center">
@@ -221,10 +216,8 @@ const Index = () => {
         </div>
       </section>
       
-      {/* Testimonials Section */}
       <TestimonialsSection />
 
-      {/* CTA para choferes */}
       <section className="py-16 px-4 bg-gradient-to-br from-[#009EE2]/10 to-[#009EE2]/20">
         <div className="container mx-auto max-w-4xl text-center">
           <div className="bg-white rounded-xl shadow-lg p-8 md:p-12 space-y-6 border border-[#009EE2]/10">
@@ -240,10 +233,10 @@ const Index = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
-                className="bg-[#DB2851] hover:bg-[#c11f45] text-white py-6 px-8 rounded-lg text-lg shadow-lg flex flex-col items-center gap-2" 
+                className="bg-[#DB2851] hover:bg-[#c11f45] text-white py-6 px-8 rounded-lg text-lg shadow-lg flex items-center gap-2" 
                 onClick={handleDriverRegistration}
               >
-                <Truck className="h-6 w-6" />
+                <Truck className="h-6 w-6 mr-2" />
                 Registrarse como Transportista
               </Button>
             </div>
@@ -251,7 +244,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Call to Action */}
       <section className="py-16 px-4 bg-[#009EE2]/10">
         <div className="container mx-auto max-w-4xl text-center">
           <h2 className="text-3xl font-bold mb-4">¿Listo para simplificar tu mudanza?</h2>
@@ -260,17 +252,16 @@ const Index = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
-              className="bg-[#DB2851] hover:bg-[#c11f45] text-white py-6 px-8 rounded-lg text-lg shadow-lg flex flex-col items-center gap-2" 
+              className="bg-[#DB2851] hover:bg-[#c11f45] text-white py-6 px-8 rounded-lg text-lg shadow-lg flex items-center gap-2" 
               onClick={handleClientRegistration}
             >
-              <Users className="h-6 w-6" />
+              <Users className="h-6 w-6 mr-2" />
               Registrarse como Cliente
             </Button>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
       <footer className="bg-[#009EE2] text-white py-12 px-4 mt-auto">
         <div className="container mx-auto max-w-6xl">
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 mb-8">
