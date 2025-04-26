@@ -1,9 +1,9 @@
-import { ChevronLeft, MapPin, Building, Home, Truck, User, Calendar } from 'lucide-react';
+import { ChevronLeft, MapPin, Building, Home, Truck, User, Calendar, Car, Camera } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select } from '@/components/ui/select';
-import { Form } from '@/components/ui/form';
+import VehicleSelector from '@/components/VehicleSelector';
+import { useState } from 'react';
 
 interface RegisterStep2Props {
   onBack: () => void;
@@ -13,6 +13,7 @@ interface RegisterStep2Props {
 
 const RegisterStep2 = ({ onBack, onSubmit, userType }: RegisterStep2Props) => {
   const isDriver = userType === "driver" || userType === "helper" || userType === "cleaning";
+  const [vehicleType, setVehicleType] = useState('');
   
   return (
     <div className="space-y-6 w-full">
@@ -98,34 +99,17 @@ const RegisterStep2 = ({ onBack, onSubmit, userType }: RegisterStep2Props) => {
           </div>
         </div>
 
-        {/* Información del vehículo (solo para conductores) */}
         {isDriver && (
-          <div className="space-y-4 pt-6 border-t">
-            <h3 className="font-medium text-gray-700">Información del vehículo</h3>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="vehicle-type">Tipo de vehículo</Label>
-                <select 
-                  id="vehicle-type"
-                  className="w-full py-2 px-3 border border-gray-300 rounded-md focus:ring-[#DB2851] focus:border-[#DB2851]"
-                >
-                  <option value="">Seleccionar...</option>
-                  <option value="van">Furgón</option>
-                  <option value="truck">Camión</option>
-                  <option value="pickup">Camioneta</option>
-                </select>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="vehicle-year">Año del vehículo</Label>
-                <Input 
-                  id="vehicle-year"
-                  type="number"
-                  placeholder="2020"
-                  className="py-2 border-gray-300"
-                />
-              </div>
+        <div className="space-y-4 pt-6 border-t">
+          <h3 className="font-medium text-gray-700">Información del vehículo</h3>
+          
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label>Tipo de vehículo</Label>
+              <VehicleSelector
+                value={vehicleType}
+                onValueChange={(value) => setVehicleType(value)}
+              />
             </div>
             
             <div className="grid grid-cols-2 gap-4">
@@ -149,17 +133,48 @@ const RegisterStep2 = ({ onBack, onSubmit, userType }: RegisterStep2Props) => {
             </div>
             
             <div className="space-y-2">
-              <Label htmlFor="vehicle-plate">Patente</Label>
-              <Input 
-                id="vehicle-plate"
-                placeholder="XX-XX-XX"
-                className="py-2 border-gray-300"
-              />
+              <Label>Fotos del vehículo</Label>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                  <Car className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+                  <p className="text-sm text-gray-500 mb-2">Foto frontal</p>
+                  <Button variant="outline" type="button" className="text-sm">
+                    Subir foto
+                  </Button>
+                </div>
+                
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                  <Car className="h-8 w-8 mx-auto text-gray-400 mb-2 transform scale-x-[-1]" />
+                  <p className="text-sm text-gray-500 mb-2">Foto trasera</p>
+                  <Button variant="outline" type="button" className="text-sm">
+                    Subir foto
+                  </Button>
+                </div>
+                
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                  <Car className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+                  <p className="text-sm text-gray-500 mb-2">Lado izquierdo</p>
+                  <Button variant="outline" type="button" className="text-sm">
+                    Subir foto
+                  </Button>
+                </div>
+                
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                  <Car className="h-8 w-8 mx-auto text-gray-400 mb-2" />
+                  <p className="text-sm text-gray-500 mb-2">Lado derecho</p>
+                  <Button variant="outline" type="button" className="text-sm">
+                    Subir foto
+                  </Button>
+                </div>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Sube fotos claras de tu vehículo desde diferentes ángulos
+              </p>
             </div>
           </div>
-        )}
-        
-        {/* Ayudante (solo para conductores) */}
+        </div>
+      )}
+
         {isDriver && (
           <div className="space-y-4 pt-6 border-t">
             <h3 className="font-medium text-gray-700">Información del ayudante (opcional)</h3>

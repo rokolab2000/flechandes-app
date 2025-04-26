@@ -25,6 +25,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import DeliveryTable from '@/components/DeliveryTable';
+import VehicleSelector from '@/components/VehicleSelector';
 
 const NewService = () => {
   const navigate = useNavigate();
@@ -392,17 +393,10 @@ const NewService = () => {
           </Label>
           <p className="text-sm text-gray-600">Selecciona el tamaño de vehículo que necesitas</p>
           
-          <Select defaultValue={vehicleType} onValueChange={setVehicleType}>
-            <SelectTrigger>
-              <SelectValue placeholder="Selecciona un vehículo" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="van">Camioneta (hasta 1 tonelada)</SelectItem>
-              <SelectItem value="small-truck">Camión Pequeño (1-3 toneladas)</SelectItem>
-              <SelectItem value="medium-truck">Camión Mediano (3-5 toneladas)</SelectItem>
-              <SelectItem value="large-truck">Camión Grande (más de 5 toneladas)</SelectItem>
-            </SelectContent>
-          </Select>
+          <VehicleSelector
+            value={vehicleType}
+            onValueChange={setVehicleType}
+          />
         </div>
 
         <div className="border rounded-lg p-4 space-y-4">
