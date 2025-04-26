@@ -240,17 +240,11 @@ const Index = () => {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
-                className="bg-[#DB2851] hover:bg-[#c11f45] text-white py-3 px-8" 
+                className="bg-[#DB2851] hover:bg-[#c11f45] text-white py-6 px-8 rounded-lg text-lg shadow-lg flex flex-col items-center gap-2" 
                 onClick={handleDriverRegistration}
               >
-                Registrarse como Chofer
-              </Button>
-              <Button
-                variant="outline"
-                className="border-[#009EE2] text-[#009EE2] hover:bg-[#009EE2]/10 py-3 px-8"
-                onClick={handleDriverRegistration}
-              >
-                Cómo funciona
+                <Truck className="h-6 w-6" />
+                Registrarse como Transportista
               </Button>
             </div>
           </div>
@@ -266,17 +260,11 @@ const Index = () => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
-              className="bg-[#DB2851] hover:bg-[#c11f45] text-white py-3 px-8" 
-              onClick={() => navigate('/login')}
+              className="bg-[#DB2851] hover:bg-[#c11f45] text-white py-6 px-8 rounded-lg text-lg shadow-lg flex flex-col items-center gap-2" 
+              onClick={handleClientRegistration}
             >
-              Comenzar Hoy
-            </Button>
-            <Button
-              variant="outline"
-              className="border-[#009EE2] text-[#009EE2] hover:bg-[#009EE2]/10"
-              onClick={() => navigate('/login')}
-            >
-              Ver demostración
+              <Users className="h-6 w-6" />
+              Registrarse como Cliente
             </Button>
           </div>
         </div>
@@ -287,7 +275,11 @@ const Index = () => {
         <div className="container mx-auto max-w-6xl">
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8 mb-8">
             <div>
-              <Logo size="md" className="text-white mb-4" />
+              <img 
+                src="/lovable-uploads/7f656404-4f2d-4fcb-bcb9-4dac91ec7c16.png" 
+                alt="Flechandes Logo" 
+                className="w-48 mb-4"
+              />
               <p className="text-sm">Soluciones de mudanza y transporte en tus manos</p>
             </div>
             
