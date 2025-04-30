@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import UserTypeSelector, { UserType } from '../UserTypeSelector';
+import VehicleSelector from '../VehicleSelector';
 
 interface RegisterStep1Props {
   userType: UserType;
@@ -20,6 +21,7 @@ const RegisterStep1 = ({
   onToggleForm 
 }: RegisterStep1Props) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [vehicleType, setVehicleType] = useState('van');
   const isCliente = ['shipping', 'moving', 'freight'].includes(userType);
   const isTransportista = ['driver', 'helper', 'cleaning'].includes(userType);
 
@@ -38,6 +40,17 @@ const RegisterStep1 = ({
         </h3>
         {isTransportista && driverIntro}
         <UserTypeSelector onSelect={onUserTypeSelect} defaultSelected={userType} />
+        
+        {isTransportista && (
+          <div className="space-y-2 pt-4">
+            <Label htmlFor="vehicle-type" className="text-gray-700">Tipo de vehículo</Label>
+            <VehicleSelector 
+              value={vehicleType} 
+              onValueChange={setVehicleType} 
+              className="border-gray-300"
+            />
+          </div>
+        )}
       </div>
       
       <form onSubmit={onSubmit} className="space-y-4 mt-6">
