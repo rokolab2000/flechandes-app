@@ -54,10 +54,24 @@ const HeroSection = () => {
               alt="Servicios de mudanza" 
               className="w-full h-[400px] object-cover object-center"
             />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <h2 className="text-4xl font-bold text-white text-center drop-shadow-lg">
-                Mudanzas Profesionales
+            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
+              <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 drop-shadow-lg">
+                🔴¡NOS MOVEMOS CONTIGO!🔵
               </h2>
+              <div className="space-y-2 text-white text-lg md:text-xl drop-shadow-md">
+                <p className="flex items-center justify-center">
+                  <span className="mr-2">🚚</span> Mudanzas sin estrés
+                </p>
+                <p className="flex items-center justify-center">
+                  <span className="mr-2">📦</span> Envíos seguros y rápidos
+                </p>
+                <p className="flex items-center justify-center">
+                  <span className="mr-2">📍</span> Fletes a cualquier punto de la ciudad
+                </p>
+              </div>
+              <p className="mt-4 text-white font-medium text-xl">
+                Confianza - Rapidez - Economía
+              </p>
             </div>
           </div>
         </div>
