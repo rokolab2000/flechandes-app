@@ -47,18 +47,12 @@ const HeroSection = () => {
         </div>
         
         <div className="w-full md:w-1/2">
-          <div className="relative rounded-2xl shadow-xl overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-[#009EE2]/80 to-[#DB2851]/80 mix-blend-multiply"></div>
-            <img 
-              src="https://images.unsplash.com/photo-1600023622007-8b2162dab098?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" 
-              alt="Servicios de mudanza" 
-              className="w-full h-[400px] object-cover object-center"
-            />
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center">
+          <div className="relative rounded-2xl shadow-xl overflow-hidden bg-gradient-to-r from-[#009EE2] to-[#DB2851]">
+            <div className="p-10 text-center">
               <h2 className="text-3xl md:text-4xl font-bold text-white mb-4 drop-shadow-lg">
                 🔴¡NOS MOVEMOS CONTIGO!🔵
               </h2>
-              <div className="space-y-2 text-white text-lg md:text-xl drop-shadow-md">
+              <div className="space-y-4 text-white text-lg md:text-xl drop-shadow-md">
                 <p className="flex items-center justify-center">
                   <span className="mr-2">🚚</span> Mudanzas sin estrés
                 </p>
@@ -69,7 +63,7 @@ const HeroSection = () => {
                   <span className="mr-2">📍</span> Fletes a cualquier punto de la ciudad
                 </p>
               </div>
-              <p className="mt-4 text-white font-medium text-xl">
+              <p className="mt-6 text-white font-medium text-xl">
                 Confianza - Rapidez - Economía
               </p>
             </div>
@@ -81,3 +75,4 @@ const HeroSection = () => {
 };
 
 export default HeroSection;
+
