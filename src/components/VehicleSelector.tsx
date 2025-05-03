@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Bike, Motorcycle, Car } from 'lucide-react';
+import { Bike, Truck, Car } from 'lucide-react';
 import { 
   Select,
   SelectContent,
@@ -30,7 +30,7 @@ const vehicles: Vehicle[] = [
     name: 'Motocicleta',
     description: 'Entregas medianas y rápidas',
     image: '/placeholder.svg',
-    icon: <Motorcycle className="h-6 w-6 text-gray-600" />
+    icon: <Bike className="h-6 w-6 text-gray-600 transform rotate-45" /> // Usamos el icono de Bike con rotación como alternativa
   },
   {
     id: 'van',
