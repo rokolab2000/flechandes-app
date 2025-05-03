@@ -1,6 +1,7 @@
 
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -31,9 +32,9 @@ const LoginForm = ({ onSubmit, onToggleForm }: LoginFormProps) => {
       <div className="space-y-2">
         <div className="flex justify-between">
           <Label htmlFor="password" className="text-gray-700">Contraseña</Label>
-          <a href="#" className="text-sm text-[#009EE2] hover:underline">
+          <Link to="/reset-password" className="text-sm text-[#009EE2] hover:underline">
             ¿Olvidaste tu contraseña?
-          </a>
+          </Link>
         </div>
         <div className="relative">
           <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
