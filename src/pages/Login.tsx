@@ -1,14 +1,13 @@
+
 import { useState, useEffect } from 'react';
-import { useNavigate, Link, useLocation } from 'react-router-dom';
-import { Check, ArrowLeft } from 'lucide-react';
-import Logo from '@/components/Logo';
+import { useNavigate, useLocation } from 'react-router-dom';
 import LoginForm from '@/components/auth/LoginForm';
 import RegisterStep1 from '@/components/auth/RegisterStep1';
 import RegisterStep2 from '@/components/auth/RegisterStep2';
 import RegisterStep3 from '@/components/auth/RegisterStep3';
-import StepIndicator from '@/components/auth/StepIndicator';
 import { UserType } from '@/components/UserTypeSelector';
-import { Button } from '@/components/ui/button';
+import AuthLayout from '@/components/auth/AuthLayout';
+import AuthContent from '@/components/auth/AuthContent';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -49,173 +48,111 @@ const Login = () => {
     }
   };
   
-  const renderStepIndicator = () => {
-    if (isLogin || (userType !== 'driver' && userType !== 'helper' && userType !== 'cleaning' && step === 1)) return null;
-    
-    const totalSteps = userType === 'driver' || userType === 'helper' || userType === 'cleaning' ? 3 : 2;
-    return <StepIndicator currentStep={step} totalSteps={totalSteps} />;
-  };
-  
   const renderContent = () => {
+    // Get titles and subtitles based on current state
+    const getContentInfo = () => {
+      if (isLogin) {
+        return {
+          title: 'Bienvenido de nuevo',
+          subtitle: 'Inicia sesión para acceder a tu cuenta'
+        };
+      } else {
+        switch(step) {
+          case 1:
+            return {
+              title: 'Crea tu cuenta',
+              subtitle: 'Completa el formulario para comenzar'
+            };
+          case 2:
+            return {
+              title: 'Información adicional',
+              subtitle: 'Completa el formulario para comenzar'
+            };
+          case 3:
+            return {
+              title: 'Verificación',
+              subtitle: 'Completa el formulario para comenzar'
+            };
+          default:
+            return {
+              title: 'Registro',
+              subtitle: 'Completa el formulario para comenzar'
+            };
+        }
+      }
+    };
+
+    const contentInfo = getContentInfo();
+    const isTransporter = userType === 'driver' || userType === 'helper' || userType === 'cleaning';
+    const showStepIndicator = !isLogin && (isTransporter || step > 1);
+    const totalSteps = isTransporter ? 3 : 2;
+
+    let formContent;
     if (isLogin) {
-      return (
+      formContent = (
         <LoginForm 
           onSubmit={handleSubmit} 
           onToggleForm={() => {setIsLogin(false); setStep(1);}} 
         />
       );
+    } else {
+      switch(step) {
+        case 1:
+          formContent = (
+            <RegisterStep1 
+              userType={userType}
+              onUserTypeSelect={setUserType}
+              onSubmit={handleSubmit}
+              onToggleForm={() => {setIsLogin(true); setStep(1);}}
+            />
+          );
+          break;
+        case 2:
+          formContent = (
+            <RegisterStep2 
+              onBack={() => setStep(1)}
+              onSubmit={handleSubmit}
+              userType={userType}
+            />
+          );
+          break;
+        case 3:
+          formContent = (
+            <RegisterStep3 
+              onBack={() => setStep(2)}
+              onSubmit={handleSubmit}
+            />
+          );
+          break;
+        default:
+          formContent = null;
+      }
     }
-    
-    switch(step) {
-      case 1:
-        return (
-          <RegisterStep1 
-            userType={userType}
-            onUserTypeSelect={setUserType}
-            onSubmit={handleSubmit}
-            onToggleForm={() => {setIsLogin(true); setStep(1);}}
-          />
-        );
-      case 2:
-        return (
-          <RegisterStep2 
-            onBack={() => setStep(1)}
-            onSubmit={handleSubmit}
-          />
-        );
-      case 3:
-        return (
-          <RegisterStep3 
-            onBack={() => setStep(2)}
-            onSubmit={handleSubmit}
-          />
-        );
-      default:
-        return null;
-    }
+
+    return (
+      <AuthContent
+        title={contentInfo.title}
+        subtitle={contentInfo.subtitle}
+        step={step}
+        totalSteps={totalSteps}
+        showStepIndicator={showStepIndicator}
+        userType={userType}
+      >
+        {formContent}
+      </AuthContent>
+    );
   };
 
-  const renderTransporterBanner = () => (
-    <div className="max-w-md text-white">
-      <h2 className="text-3xl font-bold mb-6">Únete a nuestra red de transportistas</h2>
-      <p className="mb-8 text-lg">
-        Forma parte de la comunidad de transportistas profesionales y accede a nuevas oportunidades de trabajo.
-      </p>
-      <div className="space-y-6">
-        <div className="flex items-center">
-          <div className="bg-white/20 rounded-full p-1 mr-4">
-            <Check className="h-5 w-5" />
-          </div>
-          <span className="text-lg">Recibe solicitudes de servicios</span>
-        </div>
-        <div className="flex items-center">
-          <div className="bg-white/20 rounded-full p-1 mr-4">
-            <Check className="h-5 w-5" />
-          </div>
-          <span className="text-lg">Pagos seguros y puntuales</span>
-        </div>
-        <div className="flex items-center">
-          <div className="bg-white/20 rounded-full p-1 mr-4">
-            <Check className="h-5 w-5" />
-          </div>
-          <span className="text-lg">Flexibilidad de horarios</span>
-        </div>
-        <div className="flex items-center">
-          <div className="bg-white/20 rounded-full p-1 mr-4">
-            <Check className="h-5 w-5" />
-          </div>
-          <span className="text-lg">Soporte personalizado 24/7</span>
-        </div>
-      </div>
-    </div>
-  );
-
-  const renderClientBanner = () => (
-    <div className="max-w-md text-white">
-      <h2 className="text-3xl font-bold mb-6">Mudanzas simplificadas</h2>
-      <p className="mb-8 text-lg">
-        Conectamos a transportistas profesionales con clientes que necesitan servicios de mudanza y fletes.
-      </p>
-      <div className="space-y-6">
-        <div className="flex items-center">
-          <div className="bg-white/20 rounded-full p-1 mr-4">
-            <Check className="h-5 w-5" />
-          </div>
-          <span className="text-lg">Servicio rápido y confiable</span>
-        </div>
-        <div className="flex items-center">
-          <div className="bg-white/20 rounded-full p-1 mr-4">
-            <Check className="h-5 w-5" />
-          </div>
-          <span className="text-lg">Procesamiento de pagos seguro</span>
-        </div>
-        <div className="flex items-center">
-          <div className="bg-white/20 rounded-full p-1 mr-4">
-            <Check className="h-5 w-5" />
-          </div>
-          <span className="text-lg">Transportistas verificados</span>
-        </div>
-        <div className="flex items-center">
-          <div className="bg-white/20 rounded-full p-1 mr-4">
-            <Check className="h-5 w-5" />
-          </div>
-          <span className="text-lg">Seguimiento en tiempo real</span>
-        </div>
-      </div>
-    </div>
-  );
-
+  const isTransporter = !isLogin && (userType === 'driver' || userType === 'helper' || userType === 'cleaning');
+  
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-gray-50">
-      <div className="md:hidden p-4 flex items-center justify-between bg-white shadow-sm">
-        <Link to="/" className="flex items-center text-gray-700">
-          <ArrowLeft className="h-5 w-5 mr-2" />
-          Volver
-        </Link>
-        <Logo size="sm" />
-      </div>
-
-      <div className="w-full md:w-1/2 p-6 flex flex-col justify-center items-center">
-        <div className="w-full max-w-md">
-          <div className="hidden md:block mb-8">
-            <Logo size="lg" className="mx-auto" />
-          </div>
-          
-          <div className="bg-white p-8 rounded-2xl shadow-md">
-            <div className="text-center mb-6">
-              <h1 className="text-2xl font-bold text-gray-800">
-                {isLogin 
-                  ? 'Bienvenido de nuevo' 
-                  : step === 1 
-                    ? 'Crea tu cuenta' 
-                    : step === 2 
-                      ? 'Información adicional' 
-                      : 'Verificación'
-                }
-              </h1>
-              <p className="text-gray-600 mt-2">
-                {isLogin 
-                  ? 'Inicia sesión para acceder a tu cuenta' 
-                  : 'Completa el formulario para comenzar'
-                }
-              </p>
-            </div>
-            
-            {renderStepIndicator()}
-            {renderContent()}
-          </div>
-        </div>
-      </div>
-      
-      <div className="hidden md:block w-1/2 bg-gradient-to-br from-[#009EE2] to-[#007bb3]">
-        <div className="h-full flex items-center justify-center p-6">
-          {(!isLogin && (userType === 'driver' || userType === 'helper' || userType === 'cleaning'))
-            ? renderTransporterBanner()
-            : renderClientBanner()
-          }
-        </div>
-      </div>
-    </div>
+    <AuthLayout 
+      isTransporter={isTransporter}
+      isLogin={isLogin}
+      userType={userType}
+    >
+      {renderContent()}
+    </AuthLayout>
   );
 };
 
