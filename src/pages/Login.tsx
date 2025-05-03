@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import LoginForm from '@/components/auth/LoginForm';
@@ -39,11 +38,7 @@ const Login = () => {
       if (step < (userType === 'driver' || userType === 'helper' || userType === 'cleaning' ? 3 : 2)) {
         setStep(step + 1);
       } else {
-        if (userType === 'driver' || userType === 'helper' || userType === 'cleaning') {
-          navigate('/transporter/dashboard');
-        } else {
-          navigate('/customer/dashboard');
-        }
+        navigate('/register-success', { state: { userType } });
       }
     }
   };

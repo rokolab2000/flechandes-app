@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import ResetPassword from "./pages/ResetPassword";
+import RegisterSuccess from "./pages/RegisterSuccess";
 import CustomerDashboard from "./pages/customer/Dashboard";
 import NewService from "./pages/customer/NewService";
 import TransporterDashboard from "./pages/transporter/Dashboard";
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/login" element={<Login />} />
           <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/register-success" element={<RegisterSuccess />} />
           <Route path="/customer/dashboard" element={<CustomerDashboard />} />
           <Route path="/customer/new-service" element={<NewService />} />
           <Route path="/transporter/dashboard" element={<TransporterDashboard />} />
