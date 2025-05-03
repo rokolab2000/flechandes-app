@@ -1,10 +1,14 @@
 
-import { Package, Truck, Users } from 'lucide-react';
+import { Package, Truck, Users, Bike, Car } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import VehicleSelector from './VehicleSelector';
 
 const ServicesSection = () => {
   const navigate = useNavigate();
+  const [selectedVehicle, setSelectedVehicle] = useState('bike');
 
   const services = [
     {
@@ -44,7 +48,8 @@ const ServicesSection = () => {
         "Cobertura nacional"
       ],
       color: "bg-[#46A358]/10",
-      iconColor: "text-[#46A358]"
+      iconColor: "text-[#46A358]",
+      vehicleSelector: true
     }
   ];
 
@@ -83,6 +88,18 @@ const ServicesSection = () => {
                   </li>
                 ))}
               </ul>
+              
+              {service.vehicleSelector && (
+                <div className="mb-6">
+                  <p className="text-sm text-gray-600 mb-2">Elige el tipo de vehículo:</p>
+                  <VehicleSelector
+                    value={selectedVehicle}
+                    onValueChange={setSelectedVehicle}
+                    className="w-full"
+                  />
+                </div>
+              )}
+              
               <Button 
                 className={`w-full bg-[#DB2851] hover:bg-[#c11f45]`}
                 onClick={() => navigate('/login')}
