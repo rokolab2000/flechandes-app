@@ -6,9 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, MapPin } from 'lucide-react';
 
-// Temporalmente usamos un token público de Mapbox
+// Temporalmente usamos un token público de Mapbox actualizado
 // En producción, este token debería estar en variables de entorno
-mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZS10ZW1wIiwiYSI6ImNsdHZxMGFnbTAxM28yanBoY2cwczd4Y2YifQ.4-TQzkrH3i2nFo48L-HzWw';
+mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZS10ZW1wIiwiYSI6ImNsdHZxMGFnbTAxM28yanA5YXUwc3ZhY3YifQ.vdS7oJeJ9cKT9WT_J-94Tg';
 
 interface MapProps {
   isCustomer?: boolean;
@@ -26,6 +26,7 @@ const Map = ({ isCustomer = true, showSearchBox = true }: MapProps) => {
   const map = useRef<mapboxgl.Map | null>(null);
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
+  const [mapLoaded, setMapLoaded] = useState(false);
   
   // Datos simulados de ubicaciones
   const markers: Marker[] = [
@@ -36,55 +37,68 @@ const Map = ({ isCustomer = true, showSearchBox = true }: MapProps) => {
 
   useEffect(() => {
     if (!mapContainer.current) return;
-
-    // Inicializar mapa
-    map.current = new mapboxgl.Map({
-      container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/streets-v12',
-      center: [-3.703790, 40.416775], // Madrid como punto de inicio
-      zoom: 13
-    });
-
-    // Añadir controles de navegación
-    map.current.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
     
-    // Solicitar geolocalización del usuario
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        if (map.current) {
-          const { longitude, latitude } = position.coords;
-          map.current.flyTo({
-            center: [longitude, latitude],
-            zoom: 14,
-            essential: true
-          });
+    console.log('Iniciando mapa con token:', mapboxgl.accessToken);
 
-          // Añadir marcador del usuario
-          new mapboxgl.Marker({ color: '#009EE2' })
-            .setLngLat([longitude, latitude])
-            .addTo(map.current);
-        }
-      },
-      (error) => {
-        console.error('Error obteniendo ubicación:', error);
-      }
-    );
+    // Inicializar mapa con manejo de errores
+    try {
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: 'mapbox://styles/mapbox/streets-v12',
+        center: [-3.703790, 40.416775], // Madrid como punto de inicio
+        zoom: 13
+      });
 
-    // Añadir marcadores simulados
-    markers.forEach(marker => {
-      if (map.current) {
-        // Solo mostrar transportistas si es el dashboard del cliente
-        if (isCustomer || marker.type === 'customer') {
-          const color = marker.type === 'customer' ? '#009EE2' : '#DB2851';
-          new mapboxgl.Marker({ color })
-            .setLngLat(marker.coordinates)
-            .addTo(map.current);
-        }
+      // Verificar si el mapa se carga correctamente
+      map.current.on('load', () => {
+        console.log('Mapa cargado correctamente');
+        setMapLoaded(true);
+        
+        // Añadir marcadores simulados después de que el mapa se cargue
+        markers.forEach(marker => {
+          if (map.current && (isCustomer || marker.type === 'customer')) {
+            const color = marker.type === 'customer' ? '#009EE2' : '#DB2851';
+            new mapboxgl.Marker({ color })
+              .setLngLat(marker.coordinates)
+              .addTo(map.current);
+          }
+        });
+      });
+
+      // Añadir controles de navegación
+      map.current.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+      
+      // Solicitar geolocalización del usuario
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            if (map.current) {
+              const { longitude, latitude } = position.coords;
+              map.current.flyTo({
+                center: [longitude, latitude],
+                zoom: 14,
+                essential: true
+              });
+
+              // Añadir marcador del usuario
+              new mapboxgl.Marker({ color: '#009EE2' })
+                .setLngLat([longitude, latitude])
+                .addTo(map.current);
+            }
+          },
+          (error) => {
+            console.error('Error obteniendo ubicación:', error);
+          }
+        );
       }
-    });
+    } catch (err) {
+      console.error('Error al inicializar el mapa:', err);
+    }
 
     return () => {
-      map.current?.remove();
+      if (map.current) {
+        map.current.remove();
+      }
     };
   }, [isCustomer]);
 
@@ -95,10 +109,19 @@ const Map = ({ isCustomer = true, showSearchBox = true }: MapProps) => {
 
   return (
     <div className="w-full h-full relative">
+      {!mapLoaded && (
+        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75 z-10 rounded-lg">
+          <div className="text-center">
+            <div className="w-12 h-12 border-4 border-t-blue-500 border-gray-200 rounded-full animate-spin mx-auto mb-2"></div>
+            <p className="text-gray-700">Cargando mapa...</p>
+          </div>
+        </div>
+      )}
+      
       <div ref={mapContainer} className="w-full h-full rounded-lg overflow-hidden" />
       
       {showSearchBox && (
-        <div className="absolute top-4 left-0 right-0 mx-auto w-full max-w-md px-4">
+        <div className="absolute top-4 left-0 right-0 mx-auto w-full max-w-md px-4 z-20">
           <div className="bg-white rounded-lg shadow-lg p-4 space-y-3">
             <div className="relative">
               <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
