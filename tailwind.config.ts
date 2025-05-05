@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -94,6 +95,16 @@ export default {
           primary: '#DB2851',
           secondary: '#009EE2',
           background: '#f0f0f0',
+        },
+        'client': {
+          DEFAULT: '#DB2851', 
+          hover: '#c11f45',
+          light: '#ffebee',
+        },
+        'transporter': {
+          DEFAULT: '#009EE2',
+          hover: '#0089C9',
+          light: '#e1f5fe',
         },
 			},
 			borderRadius: {

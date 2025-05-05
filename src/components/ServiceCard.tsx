@@ -15,6 +15,7 @@ export interface ServiceProps {
   time: string;
   className?: string;
   onClick?: () => void;
+  isTransporter?: boolean;
 }
 
 const ServiceCard = ({
@@ -29,6 +30,7 @@ const ServiceCard = ({
   time,
   className,
   onClick,
+  isTransporter = false,
 }: ServiceProps) => {
   // Status badge colors
   const statusColors = {
@@ -58,6 +60,8 @@ const ServiceCard = ({
     'delivery': <Package className="h-5 w-5" />,
     'freight': <Package className="h-5 w-5" />,
   };
+
+  const buttonColor = isTransporter ? "bg-[#009EE2] hover:bg-[#0089C9]" : "bg-[#DB2851] hover:bg-[#c11f45]";
 
   return (
     <div 
@@ -97,7 +101,7 @@ const ServiceCard = ({
       {price && (
         <div className="flex justify-between items-center mt-4">
           <span className="text-lg font-semibold text-move-blue-600">€{price.toFixed(2)}</span>
-          <Button variant="default" size="sm" className="bg-move-blue-500 hover:bg-move-blue-600">
+          <Button variant="default" size="sm" className={buttonColor}>
             Ver Detalles
           </Button>
         </div>

@@ -28,8 +28,8 @@ const RegisterSuccess = () => {
       >
         <div className="space-y-6 w-full">
           <div className="flex justify-center">
-            <div className={`bg-${isTransporter ? '[#DB2851]/10' : '[#009EE2]/10'} rounded-full p-5`}>
-              <CheckCircle className={`h-16 w-16 text-${isTransporter ? '[#DB2851]' : '[#009EE2]'}`} />
+            <div className={`bg-${isTransporter ? '[#009EE2]/10' : '[#DB2851]/10'} rounded-full p-5`}>
+              <CheckCircle className={`h-16 w-16 text-${isTransporter ? '[#009EE2]' : '[#DB2851]'}`} />
             </div>
           </div>
           
@@ -49,7 +49,7 @@ const RegisterSuccess = () => {
           
           <Button 
             onClick={handleContinue} 
-            className={`w-full ${isTransporter ? 'bg-[#DB2851] hover:bg-[#c11f45]' : 'bg-[#009EE2] hover:bg-[#007bb3]'} py-2.5 text-base`}
+            className={`w-full ${isTransporter ? 'bg-[#009EE2] hover:bg-[#0089C9]' : 'bg-[#DB2851] hover:bg-[#c11f45]'} py-2.5 text-base`}
           >
             Ir al panel principal
           </Button>
