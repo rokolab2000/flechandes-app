@@ -21,9 +21,8 @@ const ServicesSection = () => {
         "Transporte seguro",
         "Desarmado y armado de muebles"
       ],
-      color: "bg-transporter-DEFAULT/10",
-      iconColor: "text-transporter-DEFAULT",
-      buttonColor: "client"
+      color: "bg-[#009EE2]/10",
+      iconColor: "text-[#009EE2]"
     },
     {
       title: "Fletes",
@@ -35,9 +34,8 @@ const ServicesSection = () => {
         "Conductores profesionales",
         "Seguimiento en tiempo real"
       ],
-      color: "bg-client-DEFAULT/10",
-      iconColor: "text-client-DEFAULT",
-      buttonColor: "transporter"
+      color: "bg-[#DB2851]/10",
+      iconColor: "text-[#DB2851]"
     },
     {
       title: "Envíos",
@@ -51,8 +49,7 @@ const ServicesSection = () => {
       ],
       color: "bg-[#46A358]/10",
       iconColor: "text-[#46A358]",
-      vehicleSelector: true,
-      buttonColor: "client"
+      vehicleSelector: true
     }
   ];
 
@@ -104,7 +101,7 @@ const ServicesSection = () => {
               )}
               
               <Button 
-                className={`w-full bg-${service.buttonColor}-DEFAULT hover:bg-${service.buttonColor}-hover`}
+                className={`w-full bg-[#DB2851] hover:bg-[#c11f45]`}
                 onClick={() => navigate('/login')}
               >
                 Solicitar {service.title}

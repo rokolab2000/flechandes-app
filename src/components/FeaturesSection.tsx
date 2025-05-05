@@ -5,22 +5,22 @@ import { Truck, Shield, Clock, Star } from 'lucide-react';
 const FeaturesSection = () => {
   const features = [
     {
-      icon: <Truck className="h-8 w-8 text-transporter-DEFAULT" />,
+      icon: <Truck className="h-8 w-8 text-[#009EE2]" />,
       title: 'Transportistas Verificados',
       description: 'Conéctate con transportistas verificados para todas tus necesidades de mudanza'
     },
     {
-      icon: <Shield className="h-8 w-8 text-transporter-DEFAULT" />,
+      icon: <Shield className="h-8 w-8 text-[#009EE2]" />,
       title: 'Seguro Incluido',
       description: 'Todas nuestras mudanzas incluyen seguro para tu tranquilidad'
     },
     {
-      icon: <Clock className="h-8 w-8 text-transporter-DEFAULT" />,
+      icon: <Clock className="h-8 w-8 text-[#009EE2]" />,
       title: 'Disponibilidad 24/7',
       description: 'Programa servicios a tu conveniencia con disponibilidad en tiempo real'
     },
     {
-      icon: <Star className="h-8 w-8 text-transporter-DEFAULT" />,
+      icon: <Star className="h-8 w-8 text-[#009EE2]" />,
       title: 'Reseñas Verificadas',
       description: 'Consulta calificaciones y opiniones de otros clientes'
     }
@@ -48,7 +48,7 @@ const FeaturesSection = () => {
     <section className="py-16 px-4 bg-white" id="caracteristicas">
       <div className="container mx-auto max-w-6xl">
         <h2 className="text-3xl font-bold mb-12 text-center">
-          Por qué elegir <span className="text-transporter-DEFAULT">Flechandes</span>
+          Por qué elegir <span className="text-[#009EE2]">Flechandes</span>
         </h2>
         
         <motion.div 

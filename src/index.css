@@ -43,12 +43,6 @@
     --sidebar-accent-foreground: 240 5.9% 10%;
     --sidebar-border: 220 13% 91%;
     --sidebar-ring: 217.2 91.2% 59.8%;
-
-    /* Flechandes colors */
-    --client-primary: 343 70% 51%; /* #DB2851 - red for clients */
-    --client-primary-hover: 343 70% 41%; /* #c11f45 - darker red */
-    --transporter-primary: 198 100% 47%; /* #009EE2 - blue for transporters */
-    --transporter-primary-hover: 198 100% 39%; /* #0089C9 - darker blue */
   }
 
   .dark {
@@ -87,12 +81,6 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
-    
-    /* Flechandes colors */
-    --client-primary: 343 70% 51%; 
-    --client-primary-hover: 343 70% 41%;
-    --transporter-primary: 198 100% 47%;
-    --transporter-primary-hover: 198 100% 39%;
   }
 }
 
@@ -122,21 +110,5 @@
   
   .move-button-outline {
     @apply px-4 py-2 border border-move-blue-500 text-move-blue-500 rounded-md hover:bg-move-blue-50 transition-colors;
-  }
-
-  .client-button {
-    @apply bg-[#DB2851] hover:bg-[#c11f45] text-white;
-  }
-
-  .transporter-button {
-    @apply bg-[#009EE2] hover:bg-[#0089C9] text-white;
-  }
-
-  .client-button-outline {
-    @apply border-[#DB2851] text-[#DB2851] hover:bg-[#DB2851]/10;
-  }
-
-  .transporter-button-outline {
-    @apply border-[#009EE2] text-[#009EE2] hover:bg-[#009EE2]/10;
   }
 }

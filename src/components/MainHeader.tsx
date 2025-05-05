@@ -8,12 +8,11 @@ const MainHeader = () => {
   const navigate = useNavigate();
 
   const handleLoginClick = () => {
-    // Por defecto, el login muestra la opción de cliente (rojo)
     navigate('/login');
   };
 
-  const handleRegisterClick = (userType: UserType = 'shipping') => {
-    navigate('/login', { state: { isRegistering: true, userType } });
+  const handleRegisterClick = () => {
+    navigate('/login', { state: { isRegistering: true } });
   };
 
   return (
@@ -25,39 +24,21 @@ const MainHeader = () => {
           <a href="#servicios" className="text-gray-700 hover:text-[#DB2851] transition-colors">Servicios</a>
           <a href="#como-funciona" className="text-gray-700 hover:text-[#DB2851] transition-colors">¿Cómo funciona?</a>
           <a href="#testimonios" className="text-gray-700 hover:text-[#DB2851] transition-colors">Testimonios</a>
-          
-          <div className="flex items-center gap-3">
-            <Button 
-              variant="outline" 
-              className="border-[#DB2851] text-[#DB2851] hover:bg-[#DB2851]/10"
-              onClick={handleLoginClick}
-            >
-              Cliente
-            </Button>
-            <Button 
-              variant="outline" 
-              className="border-[#009EE2] text-[#009EE2] hover:bg-[#009EE2]/10"
-              onClick={() => handleLoginClick()}
-            >
-              Transportista
-            </Button>
-          </div>
+          <Button 
+            variant="outline" 
+            className="border-[#DB2851] text-[#DB2851] hover:bg-[#DB2851]/10"
+            onClick={handleLoginClick}
+          >
+            Iniciar Sesión
+          </Button>
         </nav>
         
-        <div className="hidden md:flex gap-2">
-          <Button 
-            className="bg-[#DB2851] hover:bg-[#c11f45]"
-            onClick={() => handleRegisterClick('shipping')}
-          >
-            Registrar Cliente
-          </Button>
-          <Button 
-            className="bg-[#009EE2] hover:bg-[#0089C9]"
-            onClick={() => handleRegisterClick('driver')}
-          >
-            Registrar Transportista
-          </Button>
-        </div>
+        <Button 
+          className="hidden md:flex bg-[#DB2851] hover:bg-[#c11f45]"
+          onClick={handleRegisterClick}
+        >
+          Registrarse
+        </Button>
       </div>
     </header>
   );

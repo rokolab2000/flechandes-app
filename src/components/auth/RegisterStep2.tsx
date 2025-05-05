@@ -53,7 +53,7 @@ const RegisterStep2 = ({ onBack, onSubmit, userType }: RegisterStep2Props) => {
 
         <Button 
           type="submit" 
-          className={`w-full ${isDriver ? 'bg-transporter-DEFAULT hover:bg-transporter-hover' : 'bg-client-DEFAULT hover:bg-client-hover'} py-2.5 text-base mt-4`}
+          className={`w-full ${isDriver ? 'bg-[#DB2851] hover:bg-[#c11f45]' : 'bg-[#009EE2] hover:bg-[#007bb3]'} py-2.5 text-base mt-4`}
         >
           {isDriver ? "Continuar a verificación" : "Finalizar registro"}
         </Button>
