@@ -8,7 +8,18 @@ import VehicleSelector from './VehicleSelector';
 
 const ServicesSection = () => {
   const navigate = useNavigate();
-  const [selectedVehicle, setSelectedVehicle] = useState('bike');
+  const [selectedVehicles, setSelectedVehicles] = useState({
+    moving: 'van',
+    freight: 'van',
+    delivery: 'bike'
+  });
+
+  const handleVehicleChange = (service: string, value: string) => {
+    setSelectedVehicles(prev => ({
+      ...prev,
+      [service]: value
+    }));
+  };
 
   const services = [
     {
@@ -22,7 +33,9 @@ const ServicesSection = () => {
         "Desarmado y armado de muebles"
       ],
       color: "bg-[#009EE2]/10",
-      iconColor: "text-[#009EE2]"
+      iconColor: "text-[#009EE2]",
+      vehicleSelector: true,
+      serviceKey: 'moving'
     },
     {
       title: "Fletes",
@@ -35,7 +48,9 @@ const ServicesSection = () => {
         "Seguimiento en tiempo real"
       ],
       color: "bg-[#DB2851]/10",
-      iconColor: "text-[#DB2851]"
+      iconColor: "text-[#DB2851]",
+      vehicleSelector: true,
+      serviceKey: 'freight'
     },
     {
       title: "Envíos",
@@ -49,7 +64,8 @@ const ServicesSection = () => {
       ],
       color: "bg-[#46A358]/10",
       iconColor: "text-[#46A358]",
-      vehicleSelector: true
+      vehicleSelector: true,
+      serviceKey: 'delivery'
     }
   ];
 
@@ -93,8 +109,8 @@ const ServicesSection = () => {
                 <div className="mb-6">
                   <p className="text-sm text-gray-600 mb-2">Elige el tipo de vehículo:</p>
                   <VehicleSelector
-                    value={selectedVehicle}
-                    onValueChange={setSelectedVehicle}
+                    value={selectedVehicles[service.serviceKey]}
+                    onValueChange={(value) => handleVehicleChange(service.serviceKey, value)}
                     className="w-full"
                   />
                 </div>
