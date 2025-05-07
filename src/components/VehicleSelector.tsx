@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Truck, Car } from 'lucide-react';
+import { Truck, Car, Bike, Bus } from 'lucide-react';
 import { 
   Select,
   SelectContent,
@@ -24,14 +24,28 @@ const deliveryVehicles: Vehicle[] = [
     name: 'Bicicleta',
     description: 'Entregas pequeñas y rápidas',
     image: '/placeholder.svg',
-    icon: <Truck className="h-6 w-6 text-gray-600 transform scale-75" />
+    icon: <Bike className="h-6 w-6 text-gray-600" />
   },
   {
     id: 'motorcycle',
-    name: 'Motocicleta',
+    name: 'Moto',
     description: 'Entregas medianas y rápidas',
     image: '/placeholder.svg',
-    icon: <Truck className="h-6 w-6 text-gray-600 transform rotate-45 scale-75" />
+    icon: <Bike className="h-6 w-6 text-gray-600 transform rotate-45 scale-75" />
+  },
+  {
+    id: 'car',
+    name: 'Auto',
+    description: 'Entregas medianas',
+    image: '/placeholder.svg',
+    icon: <Car className="h-6 w-6 text-gray-600" />
+  },
+  {
+    id: 'furgon',
+    name: 'Furgón',
+    description: 'Entregas medianas a grandes',
+    image: '/lovable-uploads/5c43d143-230f-42ac-8335-8f38b3b809c2.png',
+    icon: <Car className="h-6 w-6 text-gray-600 transform scale-110" />
   },
   {
     id: 'van',
@@ -39,6 +53,13 @@ const deliveryVehicles: Vehicle[] = [
     description: 'hasta 1 tonelada',
     image: '/lovable-uploads/5c43d143-230f-42ac-8335-8f38b3b809c2.png',
     icon: <Car className="h-6 w-6 text-gray-600" />
+  },
+  {
+    id: 'truck',
+    name: 'Camión',
+    description: 'Entregas grandes',
+    image: '/lovable-uploads/7f656404-4f2d-4fcb-bcb9-4dac91ec7c16.png',
+    icon: <Truck className="h-6 w-6 text-gray-600" />
   },
 ];
 
@@ -96,6 +117,27 @@ const freightVehicles: Vehicle[] = [
     description: 'hasta 1 tonelada',
     image: '/lovable-uploads/5c43d143-230f-42ac-8335-8f38b3b809c2.png',
     icon: <Car className="h-6 w-6 text-gray-600" />
+  },
+  {
+    id: 'small-truck',
+    name: 'Camión Chico',
+    description: '1-3 toneladas',
+    image: '/lovable-uploads/7f656404-4f2d-4fcb-bcb9-4dac91ec7c16.png',
+    icon: <Truck className="h-6 w-6 text-gray-600" />
+  },
+  {
+    id: 'medium-truck',
+    name: 'Camión Mediano',
+    description: '3-5 toneladas',
+    image: '/lovable-uploads/7f656404-4f2d-4fcb-bcb9-4dac91ec7c16.png',
+    icon: <Truck className="h-6 w-6 text-gray-600 transform scale-110" />
+  },
+  {
+    id: 'large-truck',
+    name: 'Camión Grande',
+    description: 'más de 5 toneladas',
+    image: '/lovable-uploads/7f656404-4f2d-4fcb-bcb9-4dac91ec7c16.png',
+    icon: <Truck className="h-6 w-6 text-gray-600 transform scale-125" />
   }
 ];
 
