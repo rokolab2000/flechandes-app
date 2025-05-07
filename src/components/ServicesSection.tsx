@@ -10,7 +10,7 @@ const ServicesSection = () => {
   const navigate = useNavigate();
   const [selectedVehicles, setSelectedVehicles] = useState({
     moving: 'van',
-    freight: 'van',
+    freight: 'small-truck',
     delivery: 'bike'
   });
 
@@ -35,7 +35,8 @@ const ServicesSection = () => {
       color: "bg-[#009EE2]/10",
       iconColor: "text-[#009EE2]",
       vehicleSelector: true,
-      serviceKey: 'moving'
+      serviceKey: 'moving',
+      serviceType: 'moving'
     },
     {
       title: "Fletes",
@@ -50,7 +51,8 @@ const ServicesSection = () => {
       color: "bg-[#DB2851]/10",
       iconColor: "text-[#DB2851]",
       vehicleSelector: true,
-      serviceKey: 'freight'
+      serviceKey: 'freight',
+      serviceType: 'freight'
     },
     {
       title: "Envíos",
@@ -65,7 +67,8 @@ const ServicesSection = () => {
       color: "bg-[#46A358]/10",
       iconColor: "text-[#46A358]",
       vehicleSelector: true,
-      serviceKey: 'delivery'
+      serviceKey: 'delivery',
+      serviceType: 'delivery'
     }
   ];
 
@@ -112,6 +115,7 @@ const ServicesSection = () => {
                     value={selectedVehicles[service.serviceKey]}
                     onValueChange={(value) => handleVehicleChange(service.serviceKey, value)}
                     className="w-full"
+                    serviceType={service.serviceType as 'moving' | 'freight' | 'delivery'}
                   />
                 </div>
               )}

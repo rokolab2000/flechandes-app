@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Bike, Truck, Car } from 'lucide-react';
+import { Truck, Car } from 'lucide-react';
 import { 
   Select,
   SelectContent,
@@ -17,20 +17,39 @@ interface Vehicle {
   icon?: React.ReactNode;
 }
 
-const vehicles: Vehicle[] = [
+// Vehículos para el servicio de envíos
+const deliveryVehicles: Vehicle[] = [
   {
     id: 'bike',
     name: 'Bicicleta',
     description: 'Entregas pequeñas y rápidas',
     image: '/placeholder.svg',
-    icon: <Bike className="h-6 w-6 text-gray-600" />
+    icon: <Truck className="h-6 w-6 text-gray-600 transform scale-75" />
   },
   {
     id: 'motorcycle',
     name: 'Motocicleta',
     description: 'Entregas medianas y rápidas',
     image: '/placeholder.svg',
-    icon: <Bike className="h-6 w-6 text-gray-600 transform rotate-45" /> // Usamos el icono de Bike con rotación como alternativa
+    icon: <Truck className="h-6 w-6 text-gray-600 transform rotate-45 scale-75" />
+  },
+  {
+    id: 'van',
+    name: 'Camioneta',
+    description: 'hasta 1 tonelada',
+    image: '/lovable-uploads/5c43d143-230f-42ac-8335-8f38b3b809c2.png',
+    icon: <Car className="h-6 w-6 text-gray-600" />
+  },
+];
+
+// Vehículos para los servicios de mudanzas y fletes
+const movingFreightVehicles: Vehicle[] = [
+  {
+    id: 'furgon',
+    name: 'Furgón',
+    description: 'Ideal para pequeñas mudanzas',
+    image: '/lovable-uploads/5c43d143-230f-42ac-8335-8f38b3b809c2.png',
+    icon: <Car className="h-6 w-6 text-gray-600" />
   },
   {
     id: 'van',
@@ -43,19 +62,22 @@ const vehicles: Vehicle[] = [
     id: 'small-truck',
     name: 'Camión Pequeño',
     description: '1-3 toneladas',
-    image: '/lovable-uploads/7f656404-4f2d-4fcb-bcb9-4dac91ec7c16.png'
+    image: '/lovable-uploads/7f656404-4f2d-4fcb-bcb9-4dac91ec7c16.png',
+    icon: <Truck className="h-6 w-6 text-gray-600" />
   },
   {
     id: 'medium-truck',
     name: 'Camión Mediano',
     description: '3-5 toneladas',
-    image: '/lovable-uploads/7f656404-4f2d-4fcb-bcb9-4dac91ec7c16.png'
+    image: '/lovable-uploads/7f656404-4f2d-4fcb-bcb9-4dac91ec7c16.png',
+    icon: <Truck className="h-6 w-6 text-gray-600 transform scale-110" />
   },
   {
     id: 'large-truck',
     name: 'Camión Grande',
     description: 'más de 5 toneladas',
-    image: '/lovable-uploads/7f656404-4f2d-4fcb-bcb9-4dac91ec7c16.png'
+    image: '/lovable-uploads/7f656404-4f2d-4fcb-bcb9-4dac91ec7c16.png',
+    icon: <Truck className="h-6 w-6 text-gray-600 transform scale-125" />
   }
 ];
 
@@ -63,9 +85,13 @@ interface VehicleSelectorProps {
   value: string;
   onValueChange: (value: string) => void;
   className?: string;
+  serviceType?: 'moving' | 'freight' | 'delivery';
 }
 
-const VehicleSelector = ({ value, onValueChange, className }: VehicleSelectorProps) => {
+const VehicleSelector = ({ value, onValueChange, className, serviceType = 'delivery' }: VehicleSelectorProps) => {
+  // Seleccionar los vehículos basado en el tipo de servicio
+  const vehicles = serviceType === 'delivery' ? deliveryVehicles : movingFreightVehicles;
+
   return (
     <Select value={value} onValueChange={onValueChange}>
       <SelectTrigger className={`w-full ${className}`}>
