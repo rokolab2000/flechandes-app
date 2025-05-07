@@ -9,8 +9,8 @@ import VehicleSelector from './VehicleSelector';
 const ServicesSection = () => {
   const navigate = useNavigate();
   const [selectedVehicles, setSelectedVehicles] = useState({
-    moving: 'van',
-    freight: 'small-truck',
+    moving: 'furgon',
+    freight: 'furgon',
     delivery: 'bike'
   });
 

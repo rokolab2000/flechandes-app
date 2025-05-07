@@ -42,8 +42,8 @@ const deliveryVehicles: Vehicle[] = [
   },
 ];
 
-// Vehículos para los servicios de mudanzas y fletes
-const movingFreightVehicles: Vehicle[] = [
+// Vehículos para los servicios de mudanzas
+const movingVehicles: Vehicle[] = [
   {
     id: 'furgon',
     name: 'Furgón',
@@ -60,7 +60,7 @@ const movingFreightVehicles: Vehicle[] = [
   },
   {
     id: 'small-truck',
-    name: 'Camión Pequeño',
+    name: 'Camión Chico',
     description: '1-3 toneladas',
     image: '/lovable-uploads/7f656404-4f2d-4fcb-bcb9-4dac91ec7c16.png',
     icon: <Truck className="h-6 w-6 text-gray-600" />
@@ -81,6 +81,24 @@ const movingFreightVehicles: Vehicle[] = [
   }
 ];
 
+// Vehículos para los servicios de fletes
+const freightVehicles: Vehicle[] = [
+  {
+    id: 'furgon',
+    name: 'Furgón',
+    description: 'Ideal para pequeñas cargas',
+    image: '/lovable-uploads/5c43d143-230f-42ac-8335-8f38b3b809c2.png',
+    icon: <Car className="h-6 w-6 text-gray-600" />
+  },
+  {
+    id: 'van',
+    name: 'Camioneta',
+    description: 'hasta 1 tonelada',
+    image: '/lovable-uploads/5c43d143-230f-42ac-8335-8f38b3b809c2.png',
+    icon: <Car className="h-6 w-6 text-gray-600" />
+  }
+];
+
 interface VehicleSelectorProps {
   value: string;
   onValueChange: (value: string) => void;
@@ -90,7 +108,19 @@ interface VehicleSelectorProps {
 
 const VehicleSelector = ({ value, onValueChange, className, serviceType = 'delivery' }: VehicleSelectorProps) => {
   // Seleccionar los vehículos basado en el tipo de servicio
-  const vehicles = serviceType === 'delivery' ? deliveryVehicles : movingFreightVehicles;
+  let vehicles: Vehicle[];
+  
+  switch (serviceType) {
+    case 'moving':
+      vehicles = movingVehicles;
+      break;
+    case 'freight':
+      vehicles = freightVehicles;
+      break;
+    default:
+      vehicles = deliveryVehicles;
+      break;
+  }
 
   return (
     <Select value={value} onValueChange={onValueChange}>
