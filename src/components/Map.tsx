@@ -13,6 +13,7 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZS10ZW1wIiwiYSI6ImNsdHZxMGFnbTAxM28ya
 interface MapProps {
   isCustomer?: boolean;
   showSearchBox?: boolean;
+  routeData?: { origin: string; destination: string } | null;
 }
 
 interface Marker {
@@ -21,12 +22,13 @@ interface Marker {
   coordinates: [number, number];
 }
 
-const Map = ({ isCustomer = true, showSearchBox = true }: MapProps) => {
+const Map = ({ isCustomer = true, showSearchBox = true, routeData = null }: MapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
-  const [origin, setOrigin] = useState('');
-  const [destination, setDestination] = useState('');
+  const [origin, setOrigin] = useState(routeData?.origin || '');
+  const [destination, setDestination] = useState(routeData?.destination || '');
   const [mapLoaded, setMapLoaded] = useState(false);
+  const [routeDisplayed, setRouteDisplayed] = useState(false);
   
   // Datos simulados de ubicaciones
   const markers: Marker[] = [
@@ -34,6 +36,100 @@ const Map = ({ isCustomer = true, showSearchBox = true }: MapProps) => {
     { id: '2', type: 'transporter', coordinates: [-3.690880, 40.410637] }, // Cerca de Madrid
     { id: '3', type: 'transporter', coordinates: [-3.712124, 40.423852] }  // Otro cerca de Madrid
   ];
+
+  // Simulated geocoding function (in a real app, you'd use Mapbox's geocoding API)
+  const geocodeAddress = async (address: string): Promise<[number, number]> => {
+    // For demo purposes, return fixed coordinates based on address
+    if (address.toLowerCase().includes('madrid')) {
+      return [-3.703790, 40.416775];
+    } else if (address.toLowerCase().includes('barcelona')) {
+      return [2.1734, 41.3851];
+    } else if (address.toLowerCase().includes('valencia')) {
+      return [-0.3773, 39.4699];
+    } else {
+      // Default to Madrid with slight offset for demo
+      const randomOffset = Math.random() * 0.05 - 0.025;
+      return [-3.703790 + randomOffset, 40.416775 + randomOffset];
+    }
+  };
+
+  // Draw a route between two points
+  const drawRoute = async (originCoords: [number, number], destCoords: [number, number]) => {
+    if (!map.current) return;
+
+    try {
+      // In a real app, you would use the Mapbox Directions API
+      // Here we're creating a simple line for demonstration
+      
+      // Create a GeoJSON source with the route
+      const routeSource = {
+        type: 'geojson',
+        data: {
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'LineString',
+            coordinates: [originCoords, destCoords]
+          }
+        }
+      };
+
+      // Add the source to the map
+      if (map.current.getSource('route')) {
+        // @ts-ignore
+        map.current.getSource('route').setData(routeSource.data);
+      } else {
+        map.current.addSource('route', routeSource as any);
+        
+        // Add a layer showing the route
+        map.current.addLayer({
+          id: 'route',
+          type: 'line',
+          source: 'route',
+          layout: {
+            'line-join': 'round',
+            'line-cap': 'round'
+          },
+          paint: {
+            'line-color': '#009EE2',
+            'line-width': 4,
+            'line-opacity': 0.8
+          }
+        });
+      }
+
+      // Add markers for origin and destination
+      new mapboxgl.Marker({ color: '#DB2851' })
+        .setLngLat(originCoords)
+        .addTo(map.current);
+
+      new mapboxgl.Marker({ color: '#009EE2' })
+        .setLngLat(destCoords)
+        .addTo(map.current);
+
+      // Add driver marker (simulated)
+      new mapboxgl.Marker({ color: '#46A358' })
+        .setLngLat([
+          originCoords[0] - (Math.random() * 0.01),
+          originCoords[1] - (Math.random() * 0.01)
+        ])
+        .addTo(map.current);
+
+      // Fit the map to show the route
+      const bounds = new mapboxgl.LngLatBounds()
+        .extend(originCoords)
+        .extend(destCoords);
+      
+      map.current.fitBounds(bounds, {
+        padding: 100,
+        duration: 1000
+      });
+
+      setRouteDisplayed(true);
+    } catch (err) {
+      console.error('Error drawing route:', err);
+    }
+  };
 
   useEffect(() => {
     if (!mapContainer.current) return;
@@ -63,6 +159,11 @@ const Map = ({ isCustomer = true, showSearchBox = true }: MapProps) => {
               .addTo(map.current);
           }
         });
+
+        // Check if we need to show a route
+        if (routeData && routeData.origin && routeData.destination) {
+          handleRouteDisplay();
+        }
       });
 
       // Añadir controles de navegación
@@ -102,9 +203,48 @@ const Map = ({ isCustomer = true, showSearchBox = true }: MapProps) => {
     };
   }, [isCustomer]);
 
-  const handleSearch = () => {
+  // Handle drawing the route when routeData changes
+  const handleRouteDisplay = async () => {
+    if (!routeData || !routeData.origin || !routeData.destination || routeDisplayed) return;
+    
+    try {
+      const originCoords = await geocodeAddress(routeData.origin);
+      const destCoords = await geocodeAddress(routeData.destination);
+      
+      if (map.current && map.current.loaded()) {
+        drawRoute(originCoords, destCoords);
+      } else if (map.current) {
+        map.current.on('load', () => {
+          drawRoute(originCoords, destCoords);
+        });
+      }
+    } catch (err) {
+      console.error('Error displaying route:', err);
+    }
+  };
+
+  // When there's new route data, update the state and trigger route display
+  useEffect(() => {
+    if (routeData && routeData.origin && routeData.destination) {
+      setOrigin(routeData.origin);
+      setDestination(routeData.destination);
+      setRouteDisplayed(false);
+      handleRouteDisplay();
+    }
+  }, [routeData]);
+
+  const handleSearch = async () => {
+    if (!origin || !destination) return;
+    
     console.log('Buscando ruta de:', origin, 'a:', destination);
-    // Aquí iría la lógica para geocodificar y mostrar la ruta
+    
+    try {
+      const originCoords = await geocodeAddress(origin);
+      const destCoords = await geocodeAddress(destination);
+      drawRoute(originCoords, destCoords);
+    } catch (err) {
+      console.error('Error en búsqueda:', err);
+    }
   };
 
   return (

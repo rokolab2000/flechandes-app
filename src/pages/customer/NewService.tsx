@@ -26,6 +26,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/component
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import DeliveryTable from '@/components/DeliveryTable';
 import VehicleSelector from '@/components/VehicleSelector';
+import { toast } from "sonner";
 
 const NewService = () => {
   const navigate = useNavigate();
@@ -35,6 +36,8 @@ const NewService = () => {
   const [vehicleType, setVehicleType] = useState('van');
   const [packagingType, setPackagingType] = useState([]);
   const [insurance, setInsurance] = useState(false);
+  const [origin, setOrigin] = useState('');
+  const [destination, setDestination] = useState('');
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,8 +45,34 @@ const NewService = () => {
     if (step < 3) {
       setStep(step + 1);
     } else {
-      // Final submission, navigate to confirmation
-      navigate('/customer/service-confirmation');
+      // Final submission, save the service data and navigate to dashboard
+      const serviceData = {
+        type: serviceType,
+        origin,
+        destination,
+        vehicleType,
+        helpers,
+        insurance
+      };
+      
+      // In a real application, you'd save this data to a database
+      console.log('Service data submitted:', serviceData);
+      
+      // Show success toast
+      toast.success("¡Servicio solicitado con éxito! Redirigiendo al panel...");
+      
+      // Navigate to the dashboard after a short delay
+      setTimeout(() => {
+        navigate('/customer/dashboard', { 
+          state: { 
+            showRoute: true, 
+            routeData: {
+              origin,
+              destination
+            }
+          } 
+        });
+      }, 1500);
     }
   };
   
@@ -135,6 +164,8 @@ const NewService = () => {
               id="pickup-address" 
               placeholder="Ingresa la dirección de origen" 
               className="pl-10"
+              value={origin}
+              onChange={(e) => setOrigin(e.target.value)}
             />
           </div>
         </div>
@@ -147,6 +178,8 @@ const NewService = () => {
               id="delivery-address" 
               placeholder="Ingresa la dirección de destino" 
               className="pl-10"
+              value={destination}
+              onChange={(e) => setDestination(e.target.value)}
             />
           </div>
         </div>
@@ -198,6 +231,8 @@ const NewService = () => {
               id="pickup-address" 
               placeholder="Ingresa la dirección de recogida" 
               className="pl-10"
+              value={origin}
+              onChange={(e) => setOrigin(e.target.value)}
             />
           </div>
         </div>
@@ -210,6 +245,8 @@ const NewService = () => {
               id="delivery-address" 
               placeholder="Ingresa la dirección de entrega" 
               className="pl-10"
+              value={destination}
+              onChange={(e) => setDestination(e.target.value)}
             />
           </div>
         </div>

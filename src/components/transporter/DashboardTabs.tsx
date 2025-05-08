@@ -1,9 +1,9 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Map from '@/components/Map';
 import ServiceCard from '@/components/ServiceCard';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 interface DashboardTabsProps {
   availableServices: any[];
@@ -12,7 +12,20 @@ interface DashboardTabsProps {
 
 const DashboardTabs = ({ availableServices, acceptedServices }: DashboardTabsProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [activeTab, setActiveTab] = useState<'map' | 'available' | 'accepted'>('map');
+  const [routeData, setRouteData] = useState<{ origin: string; destination: string } | null>(null);
+
+  // Check if we should display a route on the map
+  useEffect(() => {
+    if (location.state && location.state.showRoute && location.state.routeData) {
+      setActiveTab('map');
+      setRouteData(location.state.routeData);
+      
+      // Clear the location state after using it
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
 
   return (
     <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
@@ -54,7 +67,11 @@ const DashboardTabs = ({ availableServices, acceptedServices }: DashboardTabsPro
       <div>
         {activeTab === 'map' ? (
           <div className="h-[500px]">
-            <Map isCustomer={false} showSearchBox={false} />
+            <Map 
+              isCustomer={false} 
+              showSearchBox={false}
+              routeData={routeData}
+            />
           </div>
         ) : (
           <div className="p-4">
