@@ -19,8 +19,8 @@ const HowItWorksSection = () => {
       iconColor: "text-[#009EE2]",
     },
     {
-      title: "Recibe ofertas",
-      description: "Los transportistas cercanos te enviarán sus mejores precios",
+      title: "Envía tu oferta",
+      description: "Propón el precio que estás dispuesto a pagar por el servicio",
       icon: User,
       color: "bg-[#46A358]/10",
       iconColor: "text-[#46A358]",
@@ -50,8 +50,8 @@ const HowItWorksSection = () => {
       iconColor: "text-[#46A358]",
     },
     {
-      title: "Envía tu oferta",
-      description: "Proporciona un presupuesto competitivo para el servicio solicitado",
+      title: "Recibe ofertas",
+      description: "Los usuarios te enviarán sus ofertas para que evalúes",
       icon: Truck,
       color: "bg-[#DB2851]/10",
       iconColor: "text-[#DB2851]",
