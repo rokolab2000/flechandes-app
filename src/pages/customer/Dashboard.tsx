@@ -1,13 +1,21 @@
 
 import { useState } from 'react';
-import { PlusCircle, Package, Clock, Calendar, Search } from 'lucide-react';
+import { PlusCircle, Package, Clock, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import Logo from '@/components/Logo';
 import MobileNavbar from '@/components/MobileNavbar';
 import ServiceCard from '@/components/ServiceCard';
 import Map from '@/components/Map';
 import { useNavigate } from 'react-router-dom';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Package as PackageIcon, Truck, Users } from 'lucide-react';
 
 const CustomerDashboard = () => {
   const navigate = useNavigate();
@@ -52,6 +60,38 @@ const CustomerDashboard = () => {
       time: '08:00 AM'
     }
   ];
+
+  // Datos para las tarjetas de servicio
+  const serviceOptions = [
+    {
+      title: "Mudanzas",
+      description: "Servicio completo para trasladar tus pertenencias de manera segura",
+      icon: Users,
+      color: "bg-[#009EE2]/10",
+      iconColor: "text-[#009EE2]",
+      serviceType: 'moving' as const
+    },
+    {
+      title: "Fletes",
+      description: "Transporte de objetos grandes y pequeños a cualquier destino",
+      icon: Truck,
+      color: "bg-[#DB2851]/10",
+      iconColor: "text-[#DB2851]",
+      serviceType: 'freight' as const
+    },
+    {
+      title: "Envíos",
+      description: "Envío rápido y seguro de paquetes y documentos",
+      icon: PackageIcon,
+      color: "bg-[#46A358]/10",
+      iconColor: "text-[#46A358]",
+      serviceType: 'delivery' as const
+    }
+  ];
+
+  const handleServiceClick = (serviceType: 'moving' | 'freight' | 'delivery') => {
+    navigate('/customer/new-service', { state: { serviceType } });
+  };
   
   return (
     <div className="min-h-screen bg-gray-50">
@@ -76,23 +116,34 @@ const CustomerDashboard = () => {
           <p className="text-gray-600">Bienvenido a tu panel de control</p>
         </div>
         
-        {/* Search and Create */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="relative flex-grow">
-            <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-            <Input 
-              placeholder="Buscar servicios" 
-              className="pl-10"
-            />
-          </div>
-          
-          <Button 
-            className="bg-move-blue-500 hover:bg-move-blue-600 flex items-center gap-2"
-            onClick={() => navigate('/customer/new-service')}
-          >
-            <PlusCircle className="h-4 w-4" />
-            <span>Nuevo Servicio</span>
-          </Button>
+        {/* Service Cards - Replacing the search bar */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          {serviceOptions.map((service, index) => (
+            <Card 
+              key={index} 
+              className="hover:shadow-lg transition-shadow duration-200 cursor-pointer"
+              onClick={() => handleServiceClick(service.serviceType)}
+            >
+              <CardHeader className="pb-2">
+                <div className={`${service.color} w-12 h-12 rounded-lg flex items-center justify-center mb-2`}>
+                  <service.icon className={`h-6 w-6 ${service.iconColor}`} />
+                </div>
+                <CardTitle className="text-lg">{service.title}</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <CardDescription className="text-sm">
+                  {service.description}
+                </CardDescription>
+              </CardContent>
+              <CardFooter>
+                <Button 
+                  className="w-full bg-[#DB2851] hover:bg-[#c11f45]"
+                >
+                  Solicitar {service.title}
+                </Button>
+              </CardFooter>
+            </Card>
+          ))}
         </div>
         
         {/* Quick Stats */}
