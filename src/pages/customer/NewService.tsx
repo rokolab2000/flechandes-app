@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   ChevronLeft, 
   MapPin, 
@@ -27,11 +27,14 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 import DeliveryTable from '@/components/DeliveryTable';
 import VehicleSelector from '@/components/VehicleSelector';
 import { toast } from "sonner";
+import { ServiceType } from '@/components/customer/ServiceOptions';
+import StepIndicator from '@/components/auth/StepIndicator';
 
 const NewService = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [step, setStep] = useState(1);
-  const [serviceType, setServiceType] = useState('moving');
+  const [serviceType, setServiceType] = useState<ServiceType>('moving');
   const [helpers, setHelpers] = useState('1');
   const [vehicleType, setVehicleType] = useState('van');
   const [packagingType, setPackagingType] = useState([]);
@@ -39,10 +42,17 @@ const NewService = () => {
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
   
+  // Get service type from location state
+  useEffect(() => {
+    if (location.state?.serviceType) {
+      setServiceType(location.state.serviceType);
+    }
+  }, [location.state]);
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (step < 3) {
+    if (step < 2) {
       setStep(step + 1);
     } else {
       // Final submission, save the service data and navigate to dashboard
@@ -84,61 +94,7 @@ const NewService = () => {
     }
   };
   
-  const renderStep1 = () => (
-    <>
-      <div className="mb-6">
-        <h2 className="text-xl font-bold mb-2">¿Qué tipo de servicio necesitas?</h2>
-        <p className="text-gray-600">Elige el servicio que mejor se adapte a tus necesidades</p>
-      </div>
-      
-      <RadioGroup 
-        defaultValue={serviceType}
-        onValueChange={setServiceType}
-        className="space-y-4"
-      >
-        <div className={`border-2 rounded-lg p-4 ${serviceType === 'moving' ? 'border-move-blue-500 bg-move-blue-50' : 'border-gray-200'}`}>
-          <div className="flex items-start">
-            <RadioGroupItem value="moving" id="moving" className="mt-1" />
-            <div className="ml-3 flex-1">
-              <Label htmlFor="moving" className="text-lg font-medium flex items-center">
-                <Truck className="h-5 w-5 mr-2" />
-                Servicio Completo de Mudanza
-              </Label>
-              <p className="text-gray-600">Profesionales se encargarán de embalar, cargar, transportar y descargar tus artículos entre dos ubicaciones</p>
-            </div>
-          </div>
-        </div>
-        
-        <div className={`border-2 rounded-lg p-4 ${serviceType === 'freight' ? 'border-move-blue-500 bg-move-blue-50' : 'border-gray-200'}`}>
-          <div className="flex items-start">
-            <RadioGroupItem value="freight" id="freight" className="mt-1" />
-            <div className="ml-3 flex-1">
-              <Label htmlFor="freight" className="text-lg font-medium flex items-center">
-                <Car className="h-5 w-5 mr-2" />
-                Servicio de Fletes
-              </Label>
-              <p className="text-gray-600">Tipo taxi carga, el chofer va con su vehículo, carga y entrega tus artículos</p>
-            </div>
-          </div>
-        </div>
-        
-        <div className={`border-2 rounded-lg p-4 ${serviceType === 'delivery' ? 'border-move-blue-500 bg-move-blue-50' : 'border-gray-200'}`}>
-          <div className="flex items-start">
-            <RadioGroupItem value="delivery" id="delivery" className="mt-1" />
-            <div className="ml-3 flex-1">
-              <Label htmlFor="delivery" className="text-lg font-medium flex items-center">
-                <Boxes className="h-5 w-5 mr-2" />
-                Servicio de Envíos
-              </Label>
-              <p className="text-gray-600">Para usuarios con PyME que necesitan enviar varios productos a diferentes direcciones</p>
-            </div>
-          </div>
-        </div>
-      </RadioGroup>
-    </>
-  );
-  
-  const renderStep2 = () => {
+  const renderStep1 = () => {
     if (serviceType === 'moving') {
       return renderMovingLocationForm();
     } else if (serviceType === 'freight') {
@@ -355,7 +311,7 @@ const NewService = () => {
     </>
   );
   
-  const renderStep3 = () => {
+  const renderStep2 = () => {
     if (serviceType === 'moving') {
       return renderMovingDetailsForm();
     } else if (serviceType === 'freight') {
@@ -721,7 +677,10 @@ const NewService = () => {
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
-          <h1 className="font-semibold">Solicitar un Servicio</h1>
+          <h1 className="font-semibold">Solicitar {
+            serviceType === 'moving' ? 'Mudanza' : 
+            serviceType === 'freight' ? 'Flete' : 'Envío'
+          }</h1>
         </div>
       </header>
       
@@ -739,21 +698,10 @@ const NewService = () => {
             }`} />
           </div>
           
-          <div className="flex items-center">
-            <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-              step >= 2 ? 'bg-move-blue-500 text-white' : 'bg-gray-200'
-            }`}>
-              {step > 2 ? <Check className="h-4 w-4" /> : 2}
-            </div>
-            <div className={`h-1 w-12 ${
-              step > 2 ? 'bg-move-blue-500' : 'bg-gray-200'
-            }`} />
-          </div>
-          
           <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-            step >= 3 ? 'bg-move-blue-500 text-white' : 'bg-gray-200'
+            step >= 2 ? 'bg-move-blue-500 text-white' : 'bg-gray-200'
           }`}>
-            3
+            2
           </div>
         </div>
       </div>
@@ -764,14 +712,13 @@ const NewService = () => {
           <form onSubmit={handleSubmit}>
             {step === 1 && renderStep1()}
             {step === 2 && renderStep2()}
-            {step === 3 && renderStep3()}
             
             <div className="mt-8">
               <Button 
                 type="submit" 
                 className="w-full bg-move-blue-500 hover:bg-move-blue-600"
               >
-                {step < 3 ? 'Continuar' : 'Solicitar Presupuestos'} 
+                {step < 2 ? 'Continuar' : 'Solicitar Presupuestos'} 
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
