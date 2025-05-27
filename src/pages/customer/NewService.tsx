@@ -82,6 +82,8 @@ const NewService = () => {
       setTimeout(() => {
         navigate('/customer/dashboard', { 
           state: { 
+            showSuccessModal: true,
+            serviceData: serviceData,
             showRoute: true, 
             routeData: {
               origin,
@@ -677,7 +679,7 @@ const NewService = () => {
     <>
       <div className="mb-6">
         <h2 className="text-xl font-bold mb-2">Registro de Usuario</h2>
-        <p className="text-gray-600">Completa tu registro para solicitar el servicio</p>
+        <p className="text-gray-600">Completa tu registro o inicia sesión para solicitar el servicio</p>
       </div>
       
       <div className="space-y-4">
@@ -758,6 +760,30 @@ const NewService = () => {
             </label>
           </div>
         </div>
+        
+        <div className="relative flex items-center justify-center mt-6">
+          <hr className="w-full border-gray-200" />
+          <span className="absolute bg-white px-4 text-xs text-gray-500">o continuar con</span>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-4 mt-4">
+          <Button variant="outline" type="button" className="w-full border-gray-300 hover:bg-gray-50 text-gray-700">
+            Google
+          </Button>
+          <Button variant="outline" type="button" className="w-full border-gray-300 hover:bg-gray-50 text-gray-700">
+            Facebook
+          </Button>
+        </div>
+        
+        <p className="text-center text-sm text-gray-600 pt-4">
+          ¿Ya tienes una cuenta?{' '}
+          <button 
+            type="button"
+            className="text-[#009EE2] hover:underline font-medium"
+          >
+            Iniciar sesión
+          </button>
+        </p>
       </div>
     </>
   );

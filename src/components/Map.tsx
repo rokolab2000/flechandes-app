@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -13,7 +12,12 @@ mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZS10ZW1wIiwiYSI6ImNsdHZxMGFnbTAxM28ya
 interface MapProps {
   isCustomer?: boolean;
   showSearchBox?: boolean;
-  routeData?: { origin: string; destination: string } | null;
+  routeData?: { 
+    origin: string; 
+    destination: string; 
+    showVehicleTracking?: boolean;
+    selectedTransporter?: any;
+  } | null;
 }
 
 interface Marker {
@@ -25,10 +29,12 @@ interface Marker {
 const Map = ({ isCustomer = true, showSearchBox = true, routeData = null }: MapProps) => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
+  const vehicleMarker = useRef<mapboxgl.Marker | null>(null);
   const [origin, setOrigin] = useState(routeData?.origin || '');
   const [destination, setDestination] = useState(routeData?.destination || '');
   const [mapLoaded, setMapLoaded] = useState(false);
   const [routeDisplayed, setRouteDisplayed] = useState(false);
+  const [vehiclePosition, setVehiclePosition] = useState<[number, number] | null>(null);
   
   // Datos simulados de ubicaciones
   const markers: Marker[] = [
@@ -53,14 +59,39 @@ const Map = ({ isCustomer = true, showSearchBox = true, routeData = null }: MapP
     }
   };
 
-  // Draw a route between two points
+  // Animate vehicle movement along route
+  const animateVehicle = (startCoords: [number, number], endCoords: [number, number]) => {
+    if (!map.current) return;
+
+    const steps = 100;
+    let currentStep = 0;
+    
+    const animate = () => {
+      if (currentStep >= steps) return;
+      
+      const progress = currentStep / steps;
+      const lng = startCoords[0] + (endCoords[0] - startCoords[0]) * progress;
+      const lat = startCoords[1] + (endCoords[1] - startCoords[1]) * progress;
+      
+      const newPosition: [number, number] = [lng, lat];
+      setVehiclePosition(newPosition);
+      
+      if (vehicleMarker.current) {
+        vehicleMarker.current.setLngLat(newPosition);
+      }
+      
+      currentStep += 1;
+      setTimeout(animate, 100); // Update every 100ms
+    };
+    
+    animate();
+  };
+
+  // Draw a route between two points with Flechandes red color
   const drawRoute = async (originCoords: [number, number], destCoords: [number, number]) => {
     if (!map.current) return;
 
     try {
-      // In a real app, you would use the Mapbox Directions API
-      // Here we're creating a simple line for demonstration
-      
       // Create a GeoJSON source with the route
       const routeSource = {
         type: 'geojson',
@@ -81,7 +112,7 @@ const Map = ({ isCustomer = true, showSearchBox = true, routeData = null }: MapP
       } else {
         map.current.addSource('route', routeSource as any);
         
-        // Add a layer showing the route
+        // Add a layer showing the route with Flechandes red color
         map.current.addLayer({
           id: 'route',
           type: 'line',
@@ -91,8 +122,8 @@ const Map = ({ isCustomer = true, showSearchBox = true, routeData = null }: MapP
             'line-cap': 'round'
           },
           paint: {
-            'line-color': '#009EE2',
-            'line-width': 4,
+            'line-color': '#DB2851', // Flechandes red color
+            'line-width': 6,
             'line-opacity': 0.8
           }
         });
@@ -107,13 +138,24 @@ const Map = ({ isCustomer = true, showSearchBox = true, routeData = null }: MapP
         .setLngLat(destCoords)
         .addTo(map.current);
 
-      // Add driver marker (simulated)
-      new mapboxgl.Marker({ color: '#46A358' })
-        .setLngLat([
-          originCoords[0] - (Math.random() * 0.01),
-          originCoords[1] - (Math.random() * 0.01)
-        ])
-        .addTo(map.current);
+      // Add vehicle marker if tracking is enabled
+      if (routeData?.showVehicleTracking) {
+        // Start vehicle closer to origin
+        const vehicleStartPosition: [number, number] = [
+          originCoords[0] - 0.01,
+          originCoords[1] - 0.01
+        ];
+        
+        vehicleMarker.current = new mapboxgl.Marker({ 
+          color: '#46A358',
+          scale: 1.2 
+        })
+          .setLngLat(vehicleStartPosition)
+          .addTo(map.current);
+        
+        // Start animation
+        animateVehicle(vehicleStartPosition, originCoords);
+      }
 
       // Fit the map to show the route
       const bounds = new mapboxgl.LngLatBounds()
