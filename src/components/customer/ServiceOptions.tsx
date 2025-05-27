@@ -55,7 +55,7 @@ const ServiceOptions = () => {
   ];
 
   const handleServiceClick = (serviceType: ServiceType) => {
-    navigate('/customer/new-service', { state: { serviceType } });
+    navigate('/customer/new-service', { state: { serviceType, step: 1 } });
   };
 
   return (

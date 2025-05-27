@@ -13,7 +13,13 @@ import {
   Users,
   Shield,
   Boxes,
-  Car
+  Car,
+  Mail, 
+  Lock, 
+  Phone, 
+  User, 
+  Eye, 
+  EyeOff
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -41,21 +47,25 @@ const NewService = () => {
   const [insurance, setInsurance] = useState(false);
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   
   // Get service type from location state
   useEffect(() => {
     if (location.state?.serviceType) {
       setServiceType(location.state.serviceType);
     }
+    if (location.state?.step) {
+      setStep(location.state.step);
+    }
   }, [location.state]);
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (step < 2) {
+    if (step < 3) {
       setStep(step + 1);
     } else {
-      // Final submission, save the service data and navigate to dashboard
+      // Final submission - registro completado
       const serviceData = {
         type: serviceType,
         origin,
@@ -65,13 +75,10 @@ const NewService = () => {
         insurance
       };
       
-      // In a real application, you'd save this data to a database
       console.log('Service data submitted:', serviceData);
       
-      // Show success toast
-      toast.success("¡Servicio solicitado con éxito! Redirigiendo al panel...");
+      toast.success("¡Registro completado! Redirigiendo al panel...");
       
-      // Navigate to the dashboard after a short delay
       setTimeout(() => {
         navigate('/customer/dashboard', { 
           state: { 
@@ -665,6 +672,95 @@ const NewService = () => {
       </div>
     </>
   );
+
+  const renderStep3 = () => (
+    <>
+      <div className="mb-6">
+        <h2 className="text-xl font-bold mb-2">Registro de Usuario</h2>
+        <p className="text-gray-600">Completa tu registro para solicitar el servicio</p>
+      </div>
+      
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="names" className="text-gray-700">Nombres y apellidos</Label>
+          <div className="relative">
+            <User className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+            <Input 
+              id="names" 
+              placeholder="Ingresa tu nombre completo" 
+              type="text" 
+              className="pl-10 py-2 border-gray-300"
+            />
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="register-email" className="text-gray-700">Correo electrónico</Label>
+          <div className="relative">
+            <Mail className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+            <Input 
+              id="register-email" 
+              placeholder="ejemplo@correo.com" 
+              type="email" 
+              className="pl-10 py-2 border-gray-300"
+            />
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="register-phone" className="text-gray-700">Número de teléfono</Label>
+          <div className="relative">
+            <Phone className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+            <Input 
+              id="register-phone" 
+              placeholder="+56 9 1234 5678" 
+              type="tel" 
+              className="pl-10 py-2 border-gray-300"
+            />
+          </div>
+        </div>
+        
+        <div className="space-y-2">
+          <Label htmlFor="register-password" className="text-gray-700">Crear contraseña</Label>
+          <div className="relative">
+            <Lock className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+            <Input 
+              id="register-password" 
+              placeholder="••••••••" 
+              type={showPassword ? "text" : "password"} 
+              className="pl-10 pr-10 py-2 border-gray-300"
+            />
+            <button 
+              type="button"
+              className="absolute right-3 top-3 text-gray-400 hover:text-gray-600"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+            </button>
+          </div>
+          <p className="text-xs text-gray-500">
+            La contraseña debe tener al menos 8 caracteres
+          </p>
+        </div>
+        
+        <div className="flex items-start space-x-3 mt-4">
+          <div className="flex items-center h-5 mt-1">
+            <input
+              id="terms"
+              type="checkbox"
+              className="w-4 h-4 bg-gray-50 rounded border border-gray-300 focus:ring-[#009EE2]"
+              required
+            />
+          </div>
+          <div className="text-sm text-gray-600">
+            <label htmlFor="terms">
+              Acepto los <a href="#" className="text-[#009EE2] hover:underline">Términos de Servicio</a> y la <a href="#" className="text-[#009EE2] hover:underline">Política de Privacidad</a>
+            </label>
+          </div>
+        </div>
+      </div>
+    </>
+  );
   
   return (
     <div className="min-h-screen bg-gray-50">
@@ -701,7 +797,17 @@ const NewService = () => {
           <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
             step >= 2 ? 'bg-move-blue-500 text-white' : 'bg-gray-200'
           }`}>
-            2
+            {step > 2 ? <Check className="h-4 w-4" /> : 2}
+          </div>
+
+          <div className={`h-1 w-12 ${
+            step > 2 ? 'bg-move-blue-500' : 'bg-gray-200'
+          }`} />
+
+          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+            step >= 3 ? 'bg-move-blue-500 text-white' : 'bg-gray-200'
+          }`}>
+            3
           </div>
         </div>
       </div>
@@ -712,13 +818,14 @@ const NewService = () => {
           <form onSubmit={handleSubmit}>
             {step === 1 && renderStep1()}
             {step === 2 && renderStep2()}
+            {step === 3 && renderStep3()}
             
             <div className="mt-8">
               <Button 
                 type="submit" 
                 className="w-full bg-move-blue-500 hover:bg-move-blue-600"
               >
-                {step < 2 ? 'Continuar' : 'Solicitar Presupuestos'} 
+                {step === 1 ? 'Continuar' : step === 2 ? 'Continuar al Registro' : 'Completar Registro'} 
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
