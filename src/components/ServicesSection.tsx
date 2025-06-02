@@ -1,4 +1,3 @@
-
 import { Package, Truck, Users, Bike, Car } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -19,6 +18,10 @@ const ServicesSection = () => {
       ...prev,
       [service]: value
     }));
+  };
+
+  const handleServiceRequest = (serviceType: 'moving' | 'freight' | 'delivery') => {
+    navigate('/customer/new-service', { state: { serviceType, step: 1 } });
   };
 
   const services = [
@@ -122,7 +125,7 @@ const ServicesSection = () => {
               
               <Button 
                 className={`w-full bg-[#DB2851] hover:bg-[#c11f45]`}
-                onClick={() => navigate('/login')}
+                onClick={() => handleServiceRequest(service.serviceType as 'moving' | 'freight' | 'delivery')}
               >
                 Solicitar {service.title}
               </Button>
