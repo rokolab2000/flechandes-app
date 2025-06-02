@@ -1,6 +1,6 @@
 
 import { useNavigate } from 'react-router-dom';
-import { Truck, Users } from 'lucide-react';
+import { Truck, Users, LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const HeroSection = () => {
@@ -12,6 +12,10 @@ const HeroSection = () => {
 
   const handleDriverRegistration = () => {
     navigate('/login', { state: { userType: 'driver', isRegistering: true } });
+  };
+
+  const handleLogin = () => {
+    navigate('/login');
   };
 
   return (
@@ -26,23 +30,42 @@ const HeroSection = () => {
             Conéctate con transportistas verificados para tus necesidades de mudanza y envío de forma rápida y segura.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-            <div className="grid grid-cols-2 gap-4 w-full sm:w-auto">
+          <div className="flex flex-col gap-6 justify-center md:justify-start">
+            {/* Login Button */}
+            <div className="flex justify-center md:justify-start">
               <Button 
-                className="bg-[#DB2851] hover:bg-[#c11f45] text-white py-6 px-8 rounded-lg text-lg shadow-lg flex items-center gap-2" 
-                onClick={handleClientRegistration}
+                variant="outline"
+                className="border-[#009EE2] text-[#009EE2] hover:bg-[#009EE2]/10 py-3 px-8 rounded-lg text-lg shadow-md flex items-center gap-2" 
+                onClick={handleLogin}
               >
-                <Users className="h-6 w-6" />
-                Cliente
-              </Button>
-              <Button 
-                className="bg-[#009EE2] hover:bg-[#0080B9] text-white py-6 px-8 rounded-lg text-lg shadow-lg flex items-center gap-2" 
-                onClick={handleDriverRegistration}
-              >
-                <Truck className="h-6 w-6" />
-                Transportista
+                <LogIn className="h-5 w-5" />
+                ¿Ya tienes cuenta? Iniciar Sesión
               </Button>
             </div>
+            
+            {/* Registration Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+              <div className="grid grid-cols-2 gap-4 w-full sm:w-auto">
+                <Button 
+                  className="bg-[#DB2851] hover:bg-[#c11f45] text-white py-6 px-8 rounded-lg text-lg shadow-lg flex items-center gap-2" 
+                  onClick={handleClientRegistration}
+                >
+                  <Users className="h-6 w-6" />
+                  Cliente
+                </Button>
+                <Button 
+                  className="bg-[#009EE2] hover:bg-[#0080B9] text-white py-6 px-8 rounded-lg text-lg shadow-lg flex items-center gap-2" 
+                  onClick={handleDriverRegistration}
+                >
+                  <Truck className="h-6 w-6" />
+                  Transportista
+                </Button>
+              </div>
+            </div>
+            
+            <p className="text-sm text-gray-500 text-center md:text-left">
+              Regístrate para comenzar a usar nuestros servicios
+            </p>
           </div>
         </div>
         
@@ -75,4 +98,3 @@ const HeroSection = () => {
 };
 
 export default HeroSection;
-

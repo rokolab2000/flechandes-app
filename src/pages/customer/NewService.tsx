@@ -49,6 +49,16 @@ const NewService = () => {
   const [destination, setDestination] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   
+  // Simple authentication check (in a real app, this would come from a context/auth provider)
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  
+  // Check authentication status on component mount
+  useEffect(() => {
+    // Simple check - in a real app, this would check for actual auth tokens/session
+    const userToken = localStorage.getItem('userToken') || sessionStorage.getItem('userSession');
+    setIsAuthenticated(!!userToken);
+  }, []);
+  
   // Get service type from location state
   useEffect(() => {
     if (location.state?.serviceType) {
@@ -62,10 +72,13 @@ const NewService = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (step < 3) {
+    // If user is authenticated, skip the registration step (step 3)
+    const maxStep = isAuthenticated ? 2 : 3;
+    
+    if (step < maxStep) {
       setStep(step + 1);
     } else {
-      // Final submission - registro completado
+      // Final submission - either step 2 (if authenticated) or step 3 (if not authenticated)
       const serviceData = {
         type: serviceType,
         origin,
@@ -77,7 +90,13 @@ const NewService = () => {
       
       console.log('Service data submitted:', serviceData);
       
-      toast.success("¡Registro completado! Redirigiendo al panel...");
+      if (!isAuthenticated) {
+        // Simulate registration completion
+        localStorage.setItem('userToken', 'demo-token');
+        setIsAuthenticated(true);
+      }
+      
+      toast.success("¡Solicitud completada! Redirigiendo al panel...");
       
       setTimeout(() => {
         navigate('/customer/dashboard', { 
@@ -99,7 +118,7 @@ const NewService = () => {
     if (step > 1) {
       setStep(step - 1);
     } else {
-      navigate('/customer/dashboard');
+      navigate('/');
     }
   };
   
@@ -679,7 +698,7 @@ const NewService = () => {
     <>
       <div className="mb-6">
         <h2 className="text-xl font-bold mb-2">Registro de Usuario</h2>
-        <p className="text-gray-600">Completa tu registro o inicia sesión para solicitar el servicio</p>
+        <p className="text-gray-600">Completa tu registro para solicitar el servicio</p>
       </div>
       
       <div className="space-y-4">
@@ -788,6 +807,9 @@ const NewService = () => {
     </>
   );
   
+  // Calculate total steps based on authentication status
+  const totalSteps = isAuthenticated ? 2 : 3;
+  
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -826,15 +848,19 @@ const NewService = () => {
             {step > 2 ? <Check className="h-4 w-4" /> : 2}
           </div>
 
-          <div className={`h-1 w-12 ${
-            step > 2 ? 'bg-move-blue-500' : 'bg-gray-200'
-          }`} />
+          {!isAuthenticated && (
+            <>
+              <div className={`h-1 w-12 ${
+                step > 2 ? 'bg-move-blue-500' : 'bg-gray-200'
+              }`} />
 
-          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
-            step >= 3 ? 'bg-move-blue-500 text-white' : 'bg-gray-200'
-          }`}>
-            3
-          </div>
+              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+                step >= 3 ? 'bg-move-blue-500 text-white' : 'bg-gray-200'
+              }`}>
+                3
+              </div>
+            </>
+          )}
         </div>
       </div>
       
@@ -844,14 +870,17 @@ const NewService = () => {
           <form onSubmit={handleSubmit}>
             {step === 1 && renderStep1()}
             {step === 2 && renderStep2()}
-            {step === 3 && renderStep3()}
+            {step === 3 && !isAuthenticated && renderStep3()}
             
             <div className="mt-8">
               <Button 
                 type="submit" 
                 className="w-full bg-move-blue-500 hover:bg-move-blue-600"
               >
-                {step === 1 ? 'Continuar' : step === 2 ? 'Continuar al Registro' : 'Completar Registro'} 
+                {step === 1 ? 'Continuar' : 
+                 step === 2 && isAuthenticated ? 'Completar Solicitud' :
+                 step === 2 && !isAuthenticated ? 'Continuar al Registro' : 
+                 'Completar Registro'} 
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
