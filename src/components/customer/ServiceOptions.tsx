@@ -9,10 +9,10 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from '@/components/ui/button';
-import { Package as PackageIcon, Truck, Users } from 'lucide-react';
+import { Truck, Users } from 'lucide-react';
 
-// Service option types
-export type ServiceType = 'moving' | 'freight' | 'delivery';
+// Service option types (removed delivery)
+export type ServiceType = 'moving' | 'freight';
 
 interface ServiceOptionProps {
   title: string;
@@ -26,7 +26,7 @@ interface ServiceOptionProps {
 const ServiceOptions = () => {
   const navigate = useNavigate();
   
-  // Service options data
+  // Service options data (only moving and freight)
   const serviceOptions: ServiceOptionProps[] = [
     {
       title: "Mudanzas",
@@ -43,14 +43,6 @@ const ServiceOptions = () => {
       color: "bg-[#DB2851]/10",
       iconColor: "text-[#DB2851]",
       serviceType: 'freight'
-    },
-    {
-      title: "Envíos",
-      description: "Envío rápido y seguro de paquetes y documentos",
-      icon: PackageIcon,
-      color: "bg-[#46A358]/10",
-      iconColor: "text-[#46A358]",
-      serviceType: 'delivery'
     }
   ];
 
@@ -59,7 +51,7 @@ const ServiceOptions = () => {
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
       {serviceOptions.map((service, index) => (
         <Card 
           key={index} 

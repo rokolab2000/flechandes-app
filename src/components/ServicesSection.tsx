@@ -1,16 +1,15 @@
-import { Package, Truck, Users, Bike, Car } from 'lucide-react';
+
+import { Package, Truck, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import VehicleSelector from './VehicleSelector';
 
 const ServicesSection = () => {
   const navigate = useNavigate();
   const [selectedVehicles, setSelectedVehicles] = useState({
     moving: 'furgon',
-    freight: 'furgon',
-    delivery: 'bike'
+    freight: 'furgon'
   });
 
   const handleVehicleChange = (service: string, value: string) => {
@@ -20,7 +19,7 @@ const ServicesSection = () => {
     }));
   };
 
-  const handleServiceRequest = (serviceType: 'moving' | 'freight' | 'delivery') => {
+  const handleServiceRequest = (serviceType: 'moving' | 'freight') => {
     navigate('/customer/new-service', { state: { serviceType, step: 1 } });
   };
 
@@ -56,22 +55,6 @@ const ServicesSection = () => {
       vehicleSelector: true,
       serviceKey: 'freight',
       serviceType: 'freight'
-    },
-    {
-      title: "Envíos",
-      description: "Envío rápido y seguro de paquetes y documentos",
-      icon: Package,
-      features: [
-        "Envíos express",
-        "Embalaje seguro",
-        "Seguimiento en línea",
-        "Cobertura nacional"
-      ],
-      color: "bg-[#46A358]/10",
-      iconColor: "text-[#46A358]",
-      vehicleSelector: true,
-      serviceKey: 'delivery',
-      serviceType: 'delivery'
     }
   ];
 
@@ -87,7 +70,7 @@ const ServicesSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {services.map((service, index) => (
             <div 
               key={index}
@@ -118,14 +101,14 @@ const ServicesSection = () => {
                     value={selectedVehicles[service.serviceKey]}
                     onValueChange={(value) => handleVehicleChange(service.serviceKey, value)}
                     className="w-full"
-                    serviceType={service.serviceType as 'moving' | 'freight' | 'delivery'}
+                    serviceType={service.serviceType as 'moving' | 'freight'}
                   />
                 </div>
               )}
               
               <Button 
                 className={`w-full bg-[#DB2851] hover:bg-[#c11f45]`}
-                onClick={() => handleServiceRequest(service.serviceType as 'moving' | 'freight' | 'delivery')}
+                onClick={() => handleServiceRequest(service.serviceType as 'moving' | 'freight')}
               >
                 Solicitar {service.title}
               </Button>

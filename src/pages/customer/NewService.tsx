@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
@@ -12,8 +13,6 @@ import {
   Check,
   Users,
   Shield,
-  Boxes,
-  Car,
   Mail, 
   Lock, 
   Phone, 
@@ -27,14 +26,9 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Separator } from '@/components/ui/separator';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import DeliveryTable from '@/components/DeliveryTable';
 import VehicleSelector from '@/components/VehicleSelector';
 import { toast } from "sonner";
 import { ServiceType } from '@/components/customer/ServiceOptions';
-import StepIndicator from '@/components/auth/StepIndicator';
 
 const NewService = () => {
   const navigate = useNavigate();
@@ -43,7 +37,6 @@ const NewService = () => {
   const [serviceType, setServiceType] = useState<ServiceType>('moving');
   const [helpers, setHelpers] = useState('1');
   const [vehicleType, setVehicleType] = useState('van');
-  const [packagingType, setPackagingType] = useState([]);
   const [insurance, setInsurance] = useState(false);
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
@@ -125,10 +118,8 @@ const NewService = () => {
   const renderStep1 = () => {
     if (serviceType === 'moving') {
       return renderMovingLocationForm();
-    } else if (serviceType === 'freight') {
-      return renderFreightLocationForm();
     } else {
-      return renderDeliveryLocationForm();
+      return renderFreightLocationForm();
     }
   };
 
@@ -265,87 +256,12 @@ const NewService = () => {
       </div>
     </>
   );
-
-  const renderDeliveryLocationForm = () => (
-    <>
-      <div className="mb-6">
-        <h2 className="text-xl font-bold mb-2">Programación de Envíos</h2>
-        <p className="text-gray-600">Información para enviar productos a diferentes direcciones</p>
-      </div>
-      
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="pickup-address">Dirección de Recogida (Almacén/Tienda)</Label>
-          <div className="relative">
-            <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-            <Input 
-              id="pickup-address" 
-              placeholder="Ingresa la dirección de recogida" 
-              className="pl-10"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="pickup-date">Fecha de Recolección</Label>
-          <div className="relative">
-            <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-            <Input 
-              id="pickup-date" 
-              type="date"
-              className="pl-10"
-            />
-          </div>
-        </div>
-
-        <Separator className="my-4" />
-
-        <div className="space-y-4">
-          <h3 className="font-medium">Lista de Productos y Entregas</h3>
-          <DeliveryTable />
-        </div>
-
-        <div className="border rounded-lg p-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center">
-              <Shield className="h-5 w-5 mr-2 text-move-blue-500" />
-              <div>
-                <Label className="font-medium">Seguro de Envío</Label>
-                <p className="text-sm text-gray-600">Protege tus productos durante el transporte</p>
-              </div>
-            </div>
-            <div className="flex items-center">
-              <input 
-                type="checkbox" 
-                id="insurance" 
-                className="mr-2" 
-                checked={insurance} 
-                onChange={() => setInsurance(!insurance)} 
-              />
-              <Label htmlFor="insurance">{insurance ? 'Incluido' : 'No incluido'}</Label>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="additional-notes">Notas Adicionales (Opcional)</Label>
-          <Textarea 
-            id="additional-notes" 
-            placeholder="Cualquier instrucción o requisito especial"
-            rows={2}
-          />
-        </div>
-      </div>
-    </>
-  );
   
   const renderStep2 = () => {
     if (serviceType === 'moving') {
       return renderMovingDetailsForm();
-    } else if (serviceType === 'freight') {
-      return renderFreightDetailsForm();
     } else {
-      return renderDeliveryDetailsForm();
+      return renderFreightDetailsForm();
     }
   };
 
@@ -417,6 +333,7 @@ const NewService = () => {
           <VehicleSelector
             value={vehicleType}
             onValueChange={setVehicleType}
+            serviceType="moving"
           />
         </div>
 
@@ -544,6 +461,20 @@ const NewService = () => {
         </div>
 
         <div className="border rounded-lg p-4 space-y-4">
+          <Label className="font-medium flex items-center">
+            <Truck className="h-4 w-4 mr-2" />
+            Tipo de Vehículo
+          </Label>
+          <p className="text-sm text-gray-600">Selecciona el tamaño de vehículo que necesitas</p>
+          
+          <VehicleSelector
+            value={vehicleType}
+            onValueChange={setVehicleType}
+            serviceType="freight"
+          />
+        </div>
+
+        <div className="border rounded-lg p-4 space-y-4">
           <Label className="font-medium">Servicio de Embalaje</Label>
           <p className="text-sm text-gray-600">¿Necesitas materiales para embalar tus artículos?</p>
           
@@ -590,105 +521,6 @@ const NewService = () => {
               Seleccionar Fotos
             </Button>
           </div>
-        </div>
-      </div>
-    </>
-  );
-
-  const renderDeliveryDetailsForm = () => (
-    <>
-      <div className="mb-6">
-        <h2 className="text-xl font-bold mb-2">Detalles de los Envíos</h2>
-        <p className="text-gray-600">Información sobre los productos a enviar</p>
-      </div>
-      
-      <div className="space-y-6">
-        <div className="space-y-2">
-          <Label htmlFor="items-description" className="flex items-center">
-            <Boxes className="h-4 w-4 mr-2" />
-            Descripción de los Productos
-          </Label>
-          <Textarea 
-            id="items-description" 
-            placeholder="Describe los productos a enviar (tipo, cantidad, etc.)"
-            rows={3}
-          />
-        </div>
-
-        <div className="border rounded-lg p-4">
-          <Label className="font-medium mb-2 block">Necesidades Especiales</Label>
-          
-          <div className="space-y-3">
-            <div className="flex items-start">
-              <input type="checkbox" id="refrigerated" className="mr-2 mt-1" />
-              <div>
-                <label htmlFor="refrigerated" className="font-medium">Refrigerado</label>
-                <p className="text-xs text-gray-600">Para productos que requieren temperatura controlada</p>
-              </div>
-            </div>
-            
-            <div className="flex items-start">
-              <input type="checkbox" id="fragile" className="mr-2 mt-1" />
-              <div>
-                <label htmlFor="fragile" className="font-medium">Frágil</label>
-                <p className="text-xs text-gray-600">Manipulación especial para artículos delicados</p>
-              </div>
-            </div>
-            
-            <div className="flex items-start">
-              <input type="checkbox" id="urgent" className="mr-2 mt-1" />
-              <div>
-                <label htmlFor="urgent" className="font-medium">Urgente</label>
-                <p className="text-xs text-gray-600">Entrega prioritaria</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="border rounded-lg p-4">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center">
-              <Shield className="h-5 w-5 mr-2 text-move-blue-500" />
-              <div>
-                <Label className="font-medium">Seguro de Envío</Label>
-                <p className="text-sm text-gray-600">Protege tus productos durante el transporte</p>
-              </div>
-            </div>
-            <div className="flex items-center">
-              <input 
-                type="checkbox" 
-                id="insurance" 
-                className="mr-2" 
-                checked={insurance} 
-                onChange={() => setInsurance(!insurance)} 
-              />
-              <Label htmlFor="insurance">{insurance ? 'Incluido' : 'No incluido'}</Label>
-            </div>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="additional-notes">Instrucciones de Entrega (Opcional)</Label>
-          <Textarea 
-            id="additional-notes" 
-            placeholder="Instrucciones especiales para la entrega de los productos"
-            rows={2}
-          />
-        </div>
-
-        <div className="border rounded-lg p-4 space-y-2">
-          <Label className="font-medium">¿Recepción con firma?</Label>
-          <div className="flex gap-4">
-            <div className="flex items-center">
-              <input type="radio" id="signature-yes" name="signature" className="mr-2" />
-              <label htmlFor="signature-yes">Sí</label>
-            </div>
-            <div className="flex items-center">
-              <input type="radio" id="signature-no" name="signature" className="mr-2" />
-              <label htmlFor="signature-no">No</label>
-            </div>
-          </div>
-          <p className="text-xs text-gray-600">Si se requiere firma, alguien debe estar presente para recibir el envío</p>
         </div>
       </div>
     </>
@@ -822,8 +654,7 @@ const NewService = () => {
             <ChevronLeft className="h-5 w-5" />
           </button>
           <h1 className="font-semibold">Solicitar {
-            serviceType === 'moving' ? 'Mudanza' : 
-            serviceType === 'freight' ? 'Flete' : 'Envío'
+            serviceType === 'moving' ? 'Mudanza' : 'Flete'
           }</h1>
         </div>
       </header>

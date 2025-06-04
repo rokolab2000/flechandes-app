@@ -27,7 +27,7 @@ const HeroSection = () => {
           </h1>
           
           <p className="text-lg md:text-xl text-gray-600 mb-8 max-w-lg mx-auto md:mx-0">
-            Conéctate con transportistas verificados para tus necesidades de mudanza y envío de forma rápida y segura.
+            Conéctate con transportistas verificados para tus necesidades de mudanza y flete de forma rápida y segura.
           </p>
           
           <div className="flex flex-col gap-6 justify-center md:justify-start">
@@ -80,10 +80,10 @@ const HeroSection = () => {
                   <span className="mr-2">🚚</span> Mudanzas sin estrés
                 </p>
                 <p className="flex items-center justify-center">
-                  <span className="mr-2">📦</span> Envíos seguros y rápidos
+                  <span className="mr-2">📦</span> Fletes seguros y rápidos
                 </p>
                 <p className="flex items-center justify-center">
-                  <span className="mr-2">📍</span> Fletes a cualquier punto de la ciudad
+                  <span className="mr-2">📍</span> Transporte a cualquier punto de la ciudad
                 </p>
               </div>
               <p className="mt-6 text-white font-medium text-xl">
