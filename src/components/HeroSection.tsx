@@ -1,6 +1,6 @@
 
 import { useNavigate } from 'react-router-dom';
-import { Truck, Users, LogIn } from 'lucide-react';
+import { Truck, Users, LogIn, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const HeroSection = () => {
@@ -18,6 +18,10 @@ const HeroSection = () => {
     navigate('/login');
   };
 
+  const handleQuoteCalculator = () => {
+    navigate('/quote-calculator');
+  };
+
   return (
     <section className="relative bg-gradient-to-b from-white to-[#f5f5f5] py-16 md:py-24 px-4">
       <div className="container mx-auto max-w-6xl flex flex-col md:flex-row items-center">
@@ -31,6 +35,17 @@ const HeroSection = () => {
           </p>
           
           <div className="flex flex-col gap-6 justify-center md:justify-start">
+            {/* Quote Calculator Button */}
+            <div className="flex justify-center md:justify-start">
+              <Button 
+                className="bg-gradient-to-r from-[#009EE2] to-[#DB2851] hover:from-[#0080B9] hover:to-[#c11f45] text-white py-3 px-8 rounded-lg text-lg shadow-lg flex items-center gap-2" 
+                onClick={handleQuoteCalculator}
+              >
+                <Calculator className="h-5 w-5" />
+                Cotizador Inteligente
+              </Button>
+            </div>
+
             {/* Login Button */}
             <div className="flex justify-center md:justify-start">
               <Button 

@@ -11,6 +11,7 @@ import RegisterSuccess from "./pages/RegisterSuccess";
 import CustomerDashboard from "./pages/customer/Dashboard";
 import NewService from "./pages/customer/NewService";
 import TransporterDashboard from "./pages/transporter/Dashboard";
+import QuoteCalculator from "./pages/QuoteCalculator";
 import NotFound from "./pages/NotFound";
 
 // Create a new QueryClient instance
@@ -31,6 +32,7 @@ function App() {
             <Route path="/customer/dashboard" element={<CustomerDashboard />} />
             <Route path="/customer/new-service" element={<NewService />} />
             <Route path="/transporter/dashboard" element={<TransporterDashboard />} />
+            <Route path="/quote-calculator" element={<QuoteCalculator />} />
             {/* AÑADIR TODAS LAS RUTAS PERSONALIZADAS ENCIMA DE LA RUTA COMODÍN "*" */}
             <Route path="*" element={<NotFound />} />
           </Routes>
