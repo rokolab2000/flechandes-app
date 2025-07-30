@@ -3,8 +3,9 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Calculator, Truck, Users, ArrowLeft } from 'lucide-react';
+import { Calculator, Truck, Users, ArrowLeft, Phone, Mail } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import Logo from '@/components/Logo';
 import MovingQuoteForm from '@/components/quote/MovingQuoteForm';
 import FreightQuoteForm from '@/components/quote/FreightQuoteForm';
 
@@ -37,6 +38,7 @@ const QuoteCalculator = () => {
                 </div>
               </div>
             </div>
+            <Logo size="md" />
           </div>
         </div>
       </div>
@@ -79,6 +81,112 @@ const QuoteCalculator = () => {
             </Tabs>
           </CardContent>
         </Card>
+      </div>
+
+      {/* CTA Section - Servicios */}
+      <div className="bg-white py-16">
+        <div className="container mx-auto max-w-6xl px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4 text-gray-800">
+              Nuestros Servicios
+            </h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Flechandes te ofrece soluciones completas de transporte y logística para satisfacer todas tus necesidades
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            {/* Mudanzas */}
+            <Card className="hover:shadow-lg transition-shadow duration-200">
+              <CardContent className="p-8">
+                <div className="bg-[#009EE2]/10 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
+                  <Users className="h-8 w-8 text-[#009EE2]" />
+                </div>
+                <h3 className="text-2xl font-bold mb-4 text-gray-800">Mudanzas</h3>
+                <p className="text-gray-600 mb-6">
+                  Servicio integral de mudanzas residenciales y corporativas con personal especializado y equipos de última generación.
+                </p>
+                <ul className="space-y-2 mb-6">
+                  <li className="flex items-center gap-2 text-gray-600">
+                    <div className="w-2 h-2 bg-[#009EE2] rounded-full"></div>
+                    Embalaje profesional
+                  </li>
+                  <li className="flex items-center gap-2 text-gray-600">
+                    <div className="w-2 h-2 bg-[#009EE2] rounded-full"></div>
+                    Transporte seguro
+                  </li>
+                  <li className="flex items-center gap-2 text-gray-600">
+                    <div className="w-2 h-2 bg-[#009EE2] rounded-full"></div>
+                    Seguro incluido
+                  </li>
+                </ul>
+                <Button 
+                  className="w-full bg-[#009EE2] hover:bg-[#007bb3]"
+                  onClick={() => navigate('/customer/new-service', { state: { serviceType: 'moving', step: 1 } })}
+                >
+                  Solicitar Mudanza
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Fletes */}
+            <Card className="hover:shadow-lg transition-shadow duration-200">
+              <CardContent className="p-8">
+                <div className="bg-[#DB2851]/10 w-16 h-16 rounded-lg flex items-center justify-center mb-6">
+                  <Truck className="h-8 w-8 text-[#DB2851]" />
+                </div>
+                <h3 className="text-2xl font-bold mb-4 text-gray-800">Fletes</h3>
+                <p className="text-gray-600 mb-6">
+                  Transporte de carga y mercancías de cualquier tamaño, con la flexibilidad y confiabilidad que necesitas.
+                </p>
+                <ul className="space-y-2 mb-6">
+                  <li className="flex items-center gap-2 text-gray-600">
+                    <div className="w-2 h-2 bg-[#DB2851] rounded-full"></div>
+                    Diferentes tamaños de vehículos
+                  </li>
+                  <li className="flex items-center gap-2 text-gray-600">
+                    <div className="w-2 h-2 bg-[#DB2851] rounded-full"></div>
+                    Tracking en tiempo real
+                  </li>
+                  <li className="flex items-center gap-2 text-gray-600">
+                    <div className="w-2 h-2 bg-[#DB2851] rounded-full"></div>
+                    Entrega garantizada
+                  </li>
+                </ul>
+                <Button 
+                  className="w-full bg-[#DB2851] hover:bg-[#c11f45]"
+                  onClick={() => navigate('/customer/new-service', { state: { serviceType: 'freight', step: 1 } })}
+                >
+                  Solicitar Flete
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Contact CTA */}
+          <div className="bg-gradient-to-r from-[#009EE2] to-[#DB2851] rounded-2xl p-8 text-center text-white">
+            <h3 className="text-2xl font-bold mb-4">¿Necesitas ayuda personalizada?</h3>
+            <p className="text-lg mb-6 opacity-90">
+              Nuestro equipo de expertos está listo para asesorarte y brindarte la mejor solución
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                variant="outline" 
+                className="bg-white text-[#009EE2] border-white hover:bg-gray-100 flex items-center gap-2"
+              >
+                <Phone className="h-4 w-4" />
+                Llamar Ahora
+              </Button>
+              <Button 
+                variant="outline" 
+                className="bg-white text-[#DB2851] border-white hover:bg-gray-100 flex items-center gap-2"
+              >
+                <Mail className="h-4 w-4" />
+                Enviar Email
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
