@@ -84,7 +84,18 @@ const DashboardTabs = ({ availableServices, acceptedServices }: DashboardTabsPro
                         {...service}
                         onClick={() => navigate(`/transporter/job/${service.id}`)}
                       />
-                      <div className="absolute bottom-4 right-4">
+                      <div className="absolute bottom-4 right-4 flex gap-2">
+                        <Button 
+                          variant="outline"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setActiveTab('map');
+                            setRouteData({ origin: service.origin, destination: service.destination });
+                          }}
+                        >
+                          Ver en Mapa
+                        </Button>
                         <Button className="bg-move-green-500 hover:bg-move-green-600">
                           Aceptar Trabajo
                         </Button>
