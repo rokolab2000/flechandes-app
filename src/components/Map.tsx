@@ -4,10 +4,7 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, MapPin } from 'lucide-react';
-
-// Temporalmente usamos un token público de Mapbox actualizado
-// En producción, este token debería estar en variables de entorno
-mapboxgl.accessToken = 'pk.eyJ1IjoibG92YWJsZS10ZW1wIiwiYSI6ImNsdHZxMGFnbTAxM28yanA5YXUwc3ZhY3YifQ.vdS7oJeJ9cKT9WT_J-94Tg';
+import { supabase } from '@/integrations/supabase/client';
 
 interface MapProps {
   isCustomer?: boolean;
@@ -35,6 +32,29 @@ const Map = ({ isCustomer = true, showSearchBox = true, routeData = null }: MapP
   const [mapLoaded, setMapLoaded] = useState(false);
   const [routeDisplayed, setRouteDisplayed] = useState(false);
   const [vehiclePosition, setVehiclePosition] = useState<[number, number] | null>(null);
+  const [mapboxToken, setMapboxToken] = useState<string | null>(null);
+  
+  // Obtener el token de Mapbox desde Supabase
+  useEffect(() => {
+    const getMapboxToken = async () => {
+      try {
+        const { data, error } = await supabase.functions.invoke('get-mapbox-token');
+        if (error) {
+          console.error('Error obteniendo token de Mapbox:', error);
+          // Fallback a token temporal para desarrollo
+          setMapboxToken('pk.eyJ1IjoibG92YWJsZS10ZW1wIiwiYSI6ImNsdHZxMGFnbTAxM28yanA5YXUwc3ZhY3YifQ.vdS7oJeJ9cKT9WT_J-94Tg');
+        } else {
+          setMapboxToken(data.token);
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        // Fallback a token temporal para desarrollo
+        setMapboxToken('pk.eyJ1IjoibG92YWJsZS10ZW1wIiwiYSI6ImNsdHZxMGFnbTAxM28yanA5YXUwc3ZhY3YifQ.vdS7oJeJ9cKT9WT_J-94Tg');
+      }
+    };
+    
+    getMapboxToken();
+  }, []);
   
   // Datos simulados de ubicaciones
   const markers: Marker[] = [
@@ -174,9 +194,11 @@ const Map = ({ isCustomer = true, showSearchBox = true, routeData = null }: MapP
   };
 
   useEffect(() => {
-    if (!mapContainer.current) return;
+    if (!mapContainer.current || !mapboxToken) return;
     
-    console.log('Iniciando mapa con token:', mapboxgl.accessToken);
+    // Configurar el token de acceso de Mapbox
+    mapboxgl.accessToken = mapboxToken;
+    console.log('Iniciando mapa con token de Mapbox configurado');
 
     // Inicializar mapa con manejo de errores
     try {
@@ -243,7 +265,7 @@ const Map = ({ isCustomer = true, showSearchBox = true, routeData = null }: MapP
         map.current.remove();
       }
     };
-  }, [isCustomer]);
+  }, [isCustomer, mapboxToken]);
 
   // Handle drawing the route when routeData changes
   const handleRouteDisplay = async () => {
