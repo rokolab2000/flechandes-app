@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import mapboxgl from 'mapbox-gl';
-import 'mapbox-gl/dist/mapbox-gl.css';
+import { Loader } from '@googlemaps/js-api-loader';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Search, MapPin } from 'lucide-react';
@@ -9,355 +8,306 @@ import { supabase } from '@/integrations/supabase/client';
 interface MapProps {
   isCustomer?: boolean;
   showSearchBox?: boolean;
-  routeData?: { 
-    origin: string; 
-    destination: string; 
+  routeData?: {
+    origin: string;
+    destination: string;
     showVehicleTracking?: boolean;
-    selectedTransporter?: any;
-  } | null;
+  };
 }
 
 interface Marker {
   id: string;
   type: 'customer' | 'transporter';
-  coordinates: [number, number];
+  position: google.maps.LatLngLiteral;
 }
 
-const Map = ({ isCustomer = true, showSearchBox = true, routeData = null }: MapProps) => {
-  const mapContainer = useRef<HTMLDivElement>(null);
-  const map = useRef<mapboxgl.Map | null>(null);
-  const vehicleMarker = useRef<mapboxgl.Marker | null>(null);
-  const [origin, setOrigin] = useState(routeData?.origin || '');
-  const [destination, setDestination] = useState(routeData?.destination || '');
-  const [mapLoaded, setMapLoaded] = useState(false);
-  const [routeDisplayed, setRouteDisplayed] = useState(false);
-  const [vehiclePosition, setVehiclePosition] = useState<[number, number] | null>(null);
-  const [mapboxToken, setMapboxToken] = useState<string | null>(null);
+const Map: React.FC<MapProps> = ({ 
+  isCustomer = false, 
+  showSearchBox = false, 
+  routeData 
+}) => {
+  const mapRef = useRef<HTMLDivElement>(null);
+  const mapInstance = useRef<google.maps.Map | null>(null);
+  const directionsService = useRef<google.maps.DirectionsService | null>(null);
+  const directionsRenderer = useRef<google.maps.DirectionsRenderer | null>(null);
+  const vehicleMarker = useRef<google.maps.Marker | null>(null);
   
-  // Obtener el token de Mapbox desde Supabase
+  const [origin, setOrigin] = useState('');
+  const [destination, setDestination] = useState('');
+  const [isLoading, setIsLoading] = useState(true);
+  const [googleMapsToken, setGoogleMapsToken] = useState<string | null>(null);
+
+  // Obtener el token de Google Maps desde Supabase
   useEffect(() => {
-    const getMapboxToken = async () => {
+    const getGoogleMapsToken = async () => {
       try {
-        const { data, error } = await supabase.functions.invoke('get-mapbox-token');
+        const { data, error } = await supabase.functions.invoke('get-google-maps-token');
         if (error) {
-          console.error('Error obteniendo token de Mapbox:', error);
-          // Fallback a token temporal para desarrollo
-          setMapboxToken('pk.eyJ1IjoibG92YWJsZS10ZW1wIiwiYSI6ImNsdHZxMGFnbTAxM28yanA5YXUwc3ZhY3YifQ.vdS7oJeJ9cKT9WT_J-94Tg');
+          console.error('Error obteniendo token de Google Maps:', error);
         } else {
-          setMapboxToken(data.token);
+          setGoogleMapsToken(data.token);
         }
       } catch (error) {
         console.error('Error:', error);
-        // Fallback a token temporal para desarrollo
-        setMapboxToken('pk.eyJ1IjoibG92YWJsZS10ZW1wIiwiYSI6ImNsdHZxMGFnbTAxM28yanA5YXUwc3ZhY3YifQ.vdS7oJeJ9cKT9WT_J-94Tg');
       }
     };
     
-    getMapboxToken();
+    getGoogleMapsToken();
   }, []);
-  
+
   // Datos simulados de ubicaciones
   const markers: Marker[] = [
-    { id: '1', type: 'customer', coordinates: [-3.703790, 40.416775] }, // Madrid
-    { id: '2', type: 'transporter', coordinates: [-3.690880, 40.410637] }, // Cerca de Madrid
-    { id: '3', type: 'transporter', coordinates: [-3.712124, 40.423852] }  // Otro cerca de Madrid
+    { id: '1', type: 'customer', position: { lat: -34.6037, lng: -58.3816 } }, // Buenos Aires
+    { id: '2', type: 'transporter', position: { lat: -34.6158, lng: -58.3960 } },
+    { id: '3', type: 'customer', position: { lat: -34.5875, lng: -58.3974 } },
+    { id: '4', type: 'transporter', position: { lat: -34.6092, lng: -58.3732 } },
   ];
 
-  // Simulated geocoding function (in a real app, you'd use Mapbox's geocoding API)
-  const geocodeAddress = async (address: string): Promise<[number, number]> => {
-    // For demo purposes, return fixed coordinates based on address
-    if (address.toLowerCase().includes('madrid')) {
-      return [-3.703790, 40.416775];
-    } else if (address.toLowerCase().includes('barcelona')) {
-      return [2.1734, 41.3851];
-    } else if (address.toLowerCase().includes('valencia')) {
-      return [-0.3773, 39.4699];
-    } else {
-      // Default to Madrid with slight offset for demo
-      const randomOffset = Math.random() * 0.05 - 0.025;
-      return [-3.703790 + randomOffset, 40.416775 + randomOffset];
-    }
+  // Simular geocodificación
+  const geocodeAddress = async (address: string): Promise<google.maps.LatLngLiteral> => {
+    // En una implementación real, usarías el servicio de geocodificación de Google Maps
+    const geocoder = new google.maps.Geocoder();
+    
+    return new Promise((resolve, reject) => {
+      geocoder.geocode({ address }, (results, status) => {
+        if (status === 'OK' && results?.[0]) {
+          const location = results[0].geometry.location;
+          resolve({ lat: location.lat(), lng: location.lng() });
+        } else {
+          // Fallback a coordenadas por defecto
+          if (address.toLowerCase().includes('buenos aires')) {
+            resolve({ lat: -34.6037, lng: -58.3816 });
+          } else if (address.toLowerCase().includes('córdoba')) {
+            resolve({ lat: -31.4201, lng: -64.1888 });
+          } else {
+            resolve({ lat: -34.6037, lng: -58.3816 });
+          }
+        }
+      });
+    });
   };
 
-  // Animate vehicle movement along route
-  const animateVehicle = (startCoords: [number, number], endCoords: [number, number]) => {
-    if (!map.current) return;
+  // Animar vehículo
+  const animateVehicle = (startPos: google.maps.LatLngLiteral, endPos: google.maps.LatLngLiteral) => {
+    if (!mapInstance.current) return;
 
-    const steps = 100;
-    let currentStep = 0;
-    
+    // Crear marcador de vehículo si no existe
+    if (!vehicleMarker.current) {
+      vehicleMarker.current = new google.maps.Marker({
+        position: startPos,
+        map: mapInstance.current,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 8,
+          fillColor: '#46A358',
+          fillOpacity: 1,
+          strokeColor: '#ffffff',
+          strokeWeight: 2,
+        },
+        title: 'Vehículo en tránsito',
+      });
+    }
+
+    // Animación simple del vehículo
+    let progress = 0;
     const animate = () => {
-      if (currentStep >= steps) return;
-      
-      const progress = currentStep / steps;
-      const lng = startCoords[0] + (endCoords[0] - startCoords[0]) * progress;
-      const lat = startCoords[1] + (endCoords[1] - startCoords[1]) * progress;
-      
-      const newPosition: [number, number] = [lng, lat];
-      setVehiclePosition(newPosition);
-      
-      if (vehicleMarker.current) {
-        vehicleMarker.current.setLngLat(newPosition);
+      progress += 0.01;
+      if (progress <= 1) {
+        const lat = startPos.lat + (endPos.lat - startPos.lat) * progress;
+        const lng = startPos.lng + (endPos.lng - startPos.lng) * progress;
+        vehicleMarker.current?.setPosition({ lat, lng });
+        requestAnimationFrame(animate);
       }
-      
-      currentStep += 1;
-      setTimeout(animate, 100); // Update every 100ms
     };
-    
     animate();
   };
 
-  // Draw a route between two points with Flechandes red color
-  const drawRoute = async (originCoords: [number, number], destCoords: [number, number]) => {
-    if (!map.current) return;
+  // Dibujar ruta
+  const drawRoute = async (originPos: google.maps.LatLngLiteral, destPos: google.maps.LatLngLiteral) => {
+    if (!mapInstance.current || !directionsService.current || !directionsRenderer.current) return;
 
-    try {
-      // Create a GeoJSON source with the route
-      const routeSource = {
-        type: 'geojson',
-        data: {
-          type: 'Feature',
-          properties: {},
-          geometry: {
-            type: 'LineString',
-            coordinates: [originCoords, destCoords]
-          }
+    const request: google.maps.DirectionsRequest = {
+      origin: originPos,
+      destination: destPos,
+      travelMode: google.maps.TravelMode.DRIVING,
+    };
+
+    directionsService.current.route(request, (result, status) => {
+      if (status === 'OK' && result) {
+        directionsRenderer.current?.setDirections(result);
+        
+        // Si se debe mostrar seguimiento del vehículo, animar
+        if (routeData?.showVehicleTracking) {
+          setTimeout(() => {
+            animateVehicle(originPos, destPos);
+          }, 1000);
+        }
+      }
+    });
+  };
+
+  // Inicializar mapa
+  useEffect(() => {
+    if (!mapRef.current || !googleMapsToken) return;
+
+    const initMap = async () => {
+      try {
+        const loader = new Loader({
+          apiKey: googleMapsToken,
+          version: 'weekly',
+          libraries: ['places'],
+        });
+
+        await loader.load();
+
+        // Crear mapa
+        mapInstance.current = new google.maps.Map(mapRef.current!, {
+          center: { lat: -34.6037, lng: -58.3816 }, // Buenos Aires
+          zoom: 12,
+          styles: [
+            {
+              featureType: 'poi',
+              elementType: 'labels',
+              stylers: [{ visibility: 'off' }],
+            },
+          ],
+        });
+
+        // Inicializar servicios de direcciones
+        directionsService.current = new google.maps.DirectionsService();
+        directionsRenderer.current = new google.maps.DirectionsRenderer({
+          suppressMarkers: false,
+          polylineOptions: {
+            strokeColor: '#DB2851',
+            strokeWeight: 5,
+          },
+        });
+        directionsRenderer.current.setMap(mapInstance.current);
+
+        // Agregar marcadores iniciales
+        markers.forEach((marker) => {
+          new google.maps.Marker({
+            position: marker.position,
+            map: mapInstance.current,
+            icon: {
+              path: google.maps.SymbolPath.CIRCLE,
+              scale: 8,
+              fillColor: marker.type === 'customer' ? '#009EE2' : '#DB2851',
+              fillOpacity: 1,
+              strokeColor: '#ffffff',
+              strokeWeight: 2,
+            },
+            title: marker.type === 'customer' ? 'Cliente' : 'Transportista',
+          });
+        });
+
+        // Obtener ubicación actual del usuario
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((position) => {
+            const userLocation = {
+              lat: position.coords.latitude,
+              lng: position.coords.longitude,
+            };
+            
+            new google.maps.Marker({
+              position: userLocation,
+              map: mapInstance.current,
+              icon: {
+                path: google.maps.SymbolPath.CIRCLE,
+                scale: 10,
+                fillColor: '#009EE2',
+                fillOpacity: 1,
+                strokeColor: '#ffffff',
+                strokeWeight: 3,
+              },
+              title: 'Tu ubicación',
+            });
+          });
+        }
+
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Error inicializando Google Maps:', error);
+        setIsLoading(false);
+      }
+    };
+
+    initMap();
+  }, [googleMapsToken]);
+
+  // Manejar cambios en routeData
+  useEffect(() => {
+    if (routeData && mapInstance.current) {
+      const handleRouteDisplay = async () => {
+        try {
+          const originCoords = await geocodeAddress(routeData.origin);
+          const destCoords = await geocodeAddress(routeData.destination);
+          
+          drawRoute(originCoords, destCoords);
+        } catch (error) {
+          console.error('Error mostrando ruta:', error);
         }
       };
 
-      // Add the source to the map
-      if (map.current.getSource('route')) {
-        // @ts-ignore
-        map.current.getSource('route').setData(routeSource.data);
-      } else {
-        map.current.addSource('route', routeSource as any);
-        
-        // Add a layer showing the route with Flechandes red color
-        map.current.addLayer({
-          id: 'route',
-          type: 'line',
-          source: 'route',
-          layout: {
-            'line-join': 'round',
-            'line-cap': 'round'
-          },
-          paint: {
-            'line-color': '#DB2851', // Flechandes red color
-            'line-width': 6,
-            'line-opacity': 0.8
-          }
-        });
-      }
-
-      // Add markers for origin and destination
-      new mapboxgl.Marker({ color: '#DB2851' })
-        .setLngLat(originCoords)
-        .addTo(map.current);
-
-      new mapboxgl.Marker({ color: '#009EE2' })
-        .setLngLat(destCoords)
-        .addTo(map.current);
-
-      // Add vehicle marker if tracking is enabled
-      if (routeData?.showVehicleTracking) {
-        // Start vehicle closer to origin
-        const vehicleStartPosition: [number, number] = [
-          originCoords[0] - 0.01,
-          originCoords[1] - 0.01
-        ];
-        
-        vehicleMarker.current = new mapboxgl.Marker({ 
-          color: '#46A358',
-          scale: 1.2 
-        })
-          .setLngLat(vehicleStartPosition)
-          .addTo(map.current);
-        
-        // Start animation
-        animateVehicle(vehicleStartPosition, originCoords);
-      }
-
-      // Fit the map to show the route
-      const bounds = new mapboxgl.LngLatBounds()
-        .extend(originCoords)
-        .extend(destCoords);
-      
-      map.current.fitBounds(bounds, {
-        padding: 100,
-        duration: 1000
-      });
-
-      setRouteDisplayed(true);
-    } catch (err) {
-      console.error('Error drawing route:', err);
-    }
-  };
-
-  useEffect(() => {
-    if (!mapContainer.current || !mapboxToken) return;
-    
-    // Configurar el token de acceso de Mapbox
-    mapboxgl.accessToken = mapboxToken;
-    console.log('Iniciando mapa con token de Mapbox configurado');
-
-    // Inicializar mapa con manejo de errores
-    try {
-      map.current = new mapboxgl.Map({
-        container: mapContainer.current,
-        style: 'mapbox://styles/mapbox/streets-v12',
-        center: [-3.703790, 40.416775], // Madrid como punto de inicio
-        zoom: 13
-      });
-
-      // Verificar si el mapa se carga correctamente
-      map.current.on('load', () => {
-        console.log('Mapa cargado correctamente');
-        setMapLoaded(true);
-        
-        // Añadir marcadores simulados después de que el mapa se cargue
-        markers.forEach(marker => {
-          if (map.current && (isCustomer || marker.type === 'customer')) {
-            const color = marker.type === 'customer' ? '#009EE2' : '#DB2851';
-            new mapboxgl.Marker({ color })
-              .setLngLat(marker.coordinates)
-              .addTo(map.current);
-          }
-        });
-
-        // Check if we need to show a route
-        if (routeData && routeData.origin && routeData.destination) {
-          handleRouteDisplay();
-        }
-      });
-
-      // Añadir controles de navegación
-      map.current.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
-      
-      // Solicitar geolocalización del usuario
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            if (map.current) {
-              const { longitude, latitude } = position.coords;
-              map.current.flyTo({
-                center: [longitude, latitude],
-                zoom: 14,
-                essential: true
-              });
-
-              // Añadir marcador del usuario
-              new mapboxgl.Marker({ color: '#009EE2' })
-                .setLngLat([longitude, latitude])
-                .addTo(map.current);
-            }
-          },
-          (error) => {
-            console.error('Error obteniendo ubicación:', error);
-          }
-        );
-      }
-    } catch (err) {
-      console.error('Error al inicializar el mapa:', err);
-    }
-
-    return () => {
-      if (map.current) {
-        map.current.remove();
-      }
-    };
-  }, [isCustomer, mapboxToken]);
-
-  // Handle drawing the route when routeData changes
-  const handleRouteDisplay = async () => {
-    if (!routeData || !routeData.origin || !routeData.destination || routeDisplayed) return;
-    
-    try {
-      const originCoords = await geocodeAddress(routeData.origin);
-      const destCoords = await geocodeAddress(routeData.destination);
-      
-      if (map.current && map.current.loaded()) {
-        drawRoute(originCoords, destCoords);
-      } else if (map.current) {
-        map.current.on('load', () => {
-          drawRoute(originCoords, destCoords);
-        });
-      }
-    } catch (err) {
-      console.error('Error displaying route:', err);
-    }
-  };
-
-  // When there's new route data, update the state and trigger route display
-  useEffect(() => {
-    if (routeData && routeData.origin && routeData.destination) {
       setOrigin(routeData.origin);
       setDestination(routeData.destination);
-      setRouteDisplayed(false);
       handleRouteDisplay();
     }
   }, [routeData]);
 
+  // Búsqueda manual
   const handleSearch = async () => {
     if (!origin || !destination) return;
-    
-    console.log('Buscando ruta de:', origin, 'a:', destination);
-    
+
     try {
       const originCoords = await geocodeAddress(origin);
       const destCoords = await geocodeAddress(destination);
+      
       drawRoute(originCoords, destCoords);
-    } catch (err) {
-      console.error('Error en búsqueda:', err);
+    } catch (error) {
+      console.error('Error en la búsqueda:', error);
     }
   };
 
-  return (
-    <div className="w-full h-full relative">
-      {!mapLoaded && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 bg-opacity-75 z-10 rounded-lg">
-          <div className="text-center">
-            <div className="w-12 h-12 border-4 border-t-blue-500 border-gray-200 rounded-full animate-spin mx-auto mb-2"></div>
-            <p className="text-gray-700">Cargando mapa...</p>
-          </div>
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-96 bg-muted rounded-lg">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+          <p className="text-muted-foreground">Cargando mapa...</p>
         </div>
-      )}
-      
-      <div ref={mapContainer} className="w-full h-full rounded-lg overflow-hidden" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full h-96 rounded-lg overflow-hidden">
+      <div ref={mapRef} className="w-full h-full" />
       
       {showSearchBox && (
-        <div className="absolute top-4 left-0 right-0 mx-auto w-full max-w-md px-4 z-20">
-          <div className="bg-white rounded-lg shadow-lg p-4 space-y-3">
+        <div className="absolute top-4 left-4 right-4 bg-background/95 backdrop-blur-sm rounded-lg p-4 shadow-lg border">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="relative">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-              <Input 
-                placeholder="Origen" 
-                className="pl-10"
+              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                placeholder="Origen"
                 value={origin}
                 onChange={(e) => setOrigin(e.target.value)}
-              />
-              <div className="absolute right-3 top-2.5">
-                <MapPin className="h-4 w-4 text-gray-400" />
-              </div>
-            </div>
-            
-            <div className="relative">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
-              <Input 
-                placeholder="Destino" 
                 className="pl-10"
+              />
+            </div>
+            <div className="relative">
+              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <Input
+                placeholder="Destino"
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
+                className="pl-10"
               />
-              <div className="absolute right-3 top-2.5">
-                <MapPin className="h-4 w-4 text-gray-400" />
-              </div>
             </div>
-            
-            <Button 
-              onClick={handleSearch}
-              className="w-full bg-move-blue-500 hover:bg-move-blue-600"
-            >
-              Buscar transportistas
+            <Button onClick={handleSearch} className="w-full">
+              <Search className="w-4 h-4 mr-2" />
+              Buscar Ruta
             </Button>
           </div>
         </div>

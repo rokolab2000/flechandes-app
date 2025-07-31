@@ -12,13 +12,13 @@ serve(async (req) => {
   }
 
   try {
-    // Get the Mapbox token from environment variables
-    const mapboxToken = Deno.env.get('MAPBOX_PUBLIC_TOKEN')
+    // Get the Google Maps token from environment variables
+    const googleMapsToken = Deno.env.get('GOOGLE_MAPS_API_KEY')
     
-    if (!mapboxToken) {
+    if (!googleMapsToken) {
       return new Response(
         JSON.stringify({ 
-          error: 'Token de Mapbox no configurado. Por favor configura MAPBOX_PUBLIC_TOKEN en los secretos de Supabase.' 
+          error: 'Token de Google Maps no configurado. Por favor configura GOOGLE_MAPS_API_KEY en los secretos de Supabase.' 
         }),
         {
           status: 500,
@@ -28,7 +28,7 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ token: mapboxToken }),
+      JSON.stringify({ token: googleMapsToken }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       }
