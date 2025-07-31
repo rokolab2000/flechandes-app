@@ -41,14 +41,16 @@ const Map: React.FC<MapProps> = ({
   useEffect(() => {
     const getGoogleMapsToken = async () => {
       try {
+        console.log('🗺️ Intentando obtener token de Google Maps...');
         const { data, error } = await supabase.functions.invoke('get-google-maps-token');
         if (error) {
-          console.error('Error obteniendo token de Google Maps:', error);
+          console.error('❌ Error obteniendo token de Google Maps:', error);
         } else {
+          console.log('✅ Token de Google Maps obtenido exitosamente');
           setGoogleMapsToken(data.token);
         }
       } catch (error) {
-        console.error('Error:', error);
+        console.error('❌ Error:', error);
       }
     };
     
@@ -148,10 +150,14 @@ const Map: React.FC<MapProps> = ({
 
   // Inicializar mapa
   useEffect(() => {
-    if (!mapRef.current || !googleMapsToken) return;
+    if (!mapRef.current || !googleMapsToken) {
+      console.log('🗺️ Esperando elemento del mapa y token...', { mapRef: !!mapRef.current, token: !!googleMapsToken });
+      return;
+    }
 
     const initMap = async () => {
       try {
+        console.log('🗺️ Inicializando Google Maps...');
         const loader = new Loader({
           apiKey: googleMapsToken,
           version: 'weekly',
@@ -159,6 +165,7 @@ const Map: React.FC<MapProps> = ({
         });
 
         await loader.load();
+        console.log('✅ Google Maps API cargada exitosamente');
 
         // Crear mapa
         mapInstance.current = new google.maps.Map(mapRef.current!, {
