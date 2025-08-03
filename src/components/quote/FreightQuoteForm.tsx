@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -9,9 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { MapPin, Package, Calendar, DollarSign } from 'lucide-react';
 import VehicleSelector from '@/components/VehicleSelector';
 import { useToast } from '@/hooks/use-toast';
+import { useGoogleMapsAutocomplete } from '@/hooks/useGoogleMapsAutocomplete';
 
 const FreightQuoteForm = () => {
   const { toast } = useToast();
+  const originInputRef = useRef<HTMLInputElement>(null);
+  const destinationInputRef = useRef<HTMLInputElement>(null);
+  
   const [formData, setFormData] = useState({
     origin: '',
     destination: '',
@@ -24,6 +28,24 @@ const FreightQuoteForm = () => {
     description: ''
   });
   const [quote, setQuote] = useState<number | null>(null);
+
+  // Configurar autocompletado para origen
+  useGoogleMapsAutocomplete(originInputRef, {
+    onPlaceSelected: (place) => {
+      if (place.formatted_address) {
+        setFormData(prev => ({ ...prev, origin: place.formatted_address || '' }));
+      }
+    }
+  });
+
+  // Configurar autocompletado para destino
+  useGoogleMapsAutocomplete(destinationInputRef, {
+    onPlaceSelected: (place) => {
+      if (place.formatted_address) {
+        setFormData(prev => ({ ...prev, destination: place.formatted_address || '' }));
+      }
+    }
+  });
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -84,6 +106,7 @@ const FreightQuoteForm = () => {
               <div className="relative">
                 <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
+                  ref={originInputRef}
                   id="origin"
                   placeholder="Dirección de origen"
                   value={formData.origin}
@@ -97,6 +120,7 @@ const FreightQuoteForm = () => {
               <div className="relative">
                 <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
+                  ref={destinationInputRef}
                   id="destination"
                   placeholder="Dirección de destino"
                   value={formData.destination}
