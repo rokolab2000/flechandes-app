@@ -10,6 +10,7 @@ import { MapPin, Package, Calendar, DollarSign } from 'lucide-react';
 import VehicleSelector from '@/components/VehicleSelector';
 import { useToast } from '@/hooks/use-toast';
 import { useGoogleMapsAutocomplete } from '@/hooks/useGoogleMapsAutocomplete';
+import Map from '@/components/Map';
 
 const FreightQuoteForm = () => {
   const { toast } = useToast();
@@ -28,6 +29,7 @@ const FreightQuoteForm = () => {
     description: ''
   });
   const [quote, setQuote] = useState<number | null>(null);
+  const [routeInfo, setRouteInfo] = useState<{distance: string, duration: string} | null>(null);
 
   // Configurar autocompletado para origen
   useGoogleMapsAutocomplete(originInputRef, {
@@ -89,6 +91,7 @@ const FreightQuoteForm = () => {
   };
 
   const isFormValid = formData.origin && formData.destination && formData.date && formData.weight;
+  const shouldShowMap = formData.origin && formData.destination;
 
   return (
     <div className="space-y-6">
@@ -251,6 +254,29 @@ const FreightQuoteForm = () => {
           </Card>
         )}
       </div>
+
+      {/* Mapa con ruta */}
+      {shouldShowMap && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-[#009EE2]" />
+              Ruta del Flete
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Map
+              routeData={{
+                origin: formData.origin,
+                destination: formData.destination
+              }}
+              onDistanceCalculated={(distance, duration) => {
+                setRouteInfo({ distance, duration });
+              }}
+            />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };

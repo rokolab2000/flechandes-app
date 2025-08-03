@@ -13,6 +13,7 @@ interface MapProps {
     destination: string;
     showVehicleTracking?: boolean;
   };
+  onDistanceCalculated?: (distance: string, duration: string) => void;
 }
 
 interface Marker {
@@ -24,7 +25,8 @@ interface Marker {
 const Map: React.FC<MapProps> = ({ 
   isCustomer = false, 
   showSearchBox = false, 
-  routeData 
+  routeData,
+  onDistanceCalculated 
 }) => {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstance = useRef<google.maps.Map | null>(null);
@@ -40,6 +42,8 @@ const Map: React.FC<MapProps> = ({
   const [destination, setDestination] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [googleMapsToken, setGoogleMapsToken] = useState<string | null>(null);
+  const [routeDistance, setRouteDistance] = useState<string>('');
+  const [routeDuration, setRouteDuration] = useState<string>('');
 
   // Inicializar autocompletado de Google Places
   const initializeAutocomplete = () => {
@@ -175,6 +179,20 @@ const Map: React.FC<MapProps> = ({
       if (status === 'OK' && result) {
         directionsRenderer.current?.setDirections(result);
         
+        // Calcular distancia y duración
+        const route = result.routes[0];
+        if (route && route.legs[0]) {
+          const distance = route.legs[0].distance?.text || '';
+          const duration = route.legs[0].duration?.text || '';
+          setRouteDistance(distance);
+          setRouteDuration(duration);
+          
+          // Llamar callback si está disponible
+          if (onDistanceCalculated) {
+            onDistanceCalculated(distance, duration);
+          }
+        }
+        
         // Si se debe mostrar seguimiento del vehículo, animar
         if (routeData?.showVehicleTracking) {
           setTimeout(() => {
@@ -222,7 +240,7 @@ const Map: React.FC<MapProps> = ({
         directionsRenderer.current = new google.maps.DirectionsRenderer({
           suppressMarkers: false,
           polylineOptions: {
-            strokeColor: '#DB2851',
+            strokeColor: '#009EE2', // Línea azul
             strokeWeight: 5,
           },
         });
@@ -358,6 +376,24 @@ const Map: React.FC<MapProps> = ({
               <Search className="w-4 h-4 mr-2" />
               Buscar Ruta
             </Button>
+          </div>
+        </div>
+      )}
+      
+      {/* Información de ruta */}
+      {routeDistance && routeDuration && (
+        <div className="absolute bottom-4 left-4 right-4 bg-background/95 backdrop-blur-sm rounded-lg p-4 shadow-lg border">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="text-center">
+                <p className="text-sm text-muted-foreground">Distancia</p>
+                <p className="font-semibold text-lg text-[#009EE2]">{routeDistance}</p>
+              </div>
+              <div className="text-center">
+                <p className="text-sm text-muted-foreground">Tiempo estimado</p>
+                <p className="font-semibold text-lg text-[#009EE2]">{routeDuration}</p>
+              </div>
+            </div>
           </div>
         </div>
       )}
