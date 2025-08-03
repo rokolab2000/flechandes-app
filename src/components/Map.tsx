@@ -31,11 +31,48 @@ const Map: React.FC<MapProps> = ({
   const directionsService = useRef<google.maps.DirectionsService | null>(null);
   const directionsRenderer = useRef<google.maps.DirectionsRenderer | null>(null);
   const vehicleMarker = useRef<google.maps.Marker | null>(null);
+  const originInputRef = useRef<HTMLInputElement>(null);
+  const destinationInputRef = useRef<HTMLInputElement>(null);
+  const originAutocomplete = useRef<google.maps.places.Autocomplete | null>(null);
+  const destinationAutocomplete = useRef<google.maps.places.Autocomplete | null>(null);
   
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [googleMapsToken, setGoogleMapsToken] = useState<string | null>(null);
+
+  // Inicializar autocompletado de Google Places
+  const initializeAutocomplete = () => {
+    if (!originInputRef.current || !destinationInputRef.current) return;
+
+    // Configurar autocompletado para origen
+    originAutocomplete.current = new google.maps.places.Autocomplete(originInputRef.current, {
+      types: ['address'],
+      componentRestrictions: { country: 'ar' }, // Restringir a Argentina
+    });
+
+    // Configurar autocompletado para destino
+    destinationAutocomplete.current = new google.maps.places.Autocomplete(destinationInputRef.current, {
+      types: ['address'],
+      componentRestrictions: { country: 'ar' }, // Restringir a Argentina
+    });
+
+    // Manejar selección de lugar para origen
+    originAutocomplete.current.addListener('place_changed', () => {
+      const place = originAutocomplete.current?.getPlace();
+      if (place?.formatted_address) {
+        setOrigin(place.formatted_address);
+      }
+    });
+
+    // Manejar selección de lugar para destino
+    destinationAutocomplete.current.addListener('place_changed', () => {
+      const place = destinationAutocomplete.current?.getPlace();
+      if (place?.formatted_address) {
+        setDestination(place.formatted_address);
+      }
+    });
+  };
 
   // Obtener el token de Google Maps desde Supabase
   useEffect(() => {
@@ -232,6 +269,9 @@ const Map: React.FC<MapProps> = ({
           });
         }
 
+        // Inicializar autocompletado después de que el mapa esté listo
+        initializeAutocomplete();
+
         setIsLoading(false);
       } catch (error) {
         console.error('Error inicializando Google Maps:', error);
@@ -295,8 +335,9 @@ const Map: React.FC<MapProps> = ({
         <div className="absolute top-4 left-4 right-4 bg-background/95 backdrop-blur-sm rounded-lg p-4 shadow-lg border">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="relative">
-              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 z-10" />
               <Input
+                ref={originInputRef}
                 placeholder="Origen"
                 value={origin}
                 onChange={(e) => setOrigin(e.target.value)}
@@ -304,8 +345,9 @@ const Map: React.FC<MapProps> = ({
               />
             </div>
             <div className="relative">
-              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
+              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 z-10" />
               <Input
+                ref={destinationInputRef}
                 placeholder="Destino"
                 value={destination}
                 onChange={(e) => setDestination(e.target.value)}
