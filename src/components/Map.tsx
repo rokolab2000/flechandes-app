@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Search, MapPin } from 'lucide-react';
+import SearchControls from './map/SearchControls';
+import RouteInfo from './map/RouteInfo';
 import { supabase } from '@/integrations/supabase/client';
 
 interface MapProps {
@@ -350,52 +349,19 @@ const Map: React.FC<MapProps> = ({
       <div ref={mapRef} className="w-full h-full" />
       
       {showSearchBox && (
-        <div className="absolute top-4 left-4 right-4 bg-background/95 backdrop-blur-sm rounded-lg p-4 shadow-lg border">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="relative">
-              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 z-10" />
-              <Input
-                ref={originInputRef}
-                placeholder="Origen"
-                value={origin}
-                onChange={(e) => setOrigin(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <div className="relative">
-              <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4 z-10" />
-              <Input
-                ref={destinationInputRef}
-                placeholder="Destino"
-                value={destination}
-                onChange={(e) => setDestination(e.target.value)}
-                className="pl-10"
-              />
-            </div>
-            <Button onClick={handleSearch} className="w-full">
-              <Search className="w-4 h-4 mr-2" />
-              Buscar Ruta
-            </Button>
-          </div>
-        </div>
+        <SearchControls
+          origin={origin}
+          destination={destination}
+          onOriginChange={setOrigin}
+          onDestinationChange={setDestination}
+          onSearch={handleSearch}
+          originInputRef={originInputRef}
+          destinationInputRef={destinationInputRef}
+        />
       )}
       
-      {/* Información de ruta */}
       {routeDistance && routeDuration && (
-        <div className="absolute bottom-4 left-4 right-4 bg-background/95 backdrop-blur-sm rounded-lg p-4 shadow-lg border">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground">Distancia</p>
-                <p className="font-semibold text-lg text-[#009EE2]">{routeDistance}</p>
-              </div>
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground">Tiempo estimado</p>
-                <p className="font-semibold text-lg text-[#009EE2]">{routeDuration}</p>
-              </div>
-            </div>
-          </div>
-        </div>
+        <RouteInfo distance={routeDistance} duration={routeDuration} />
       )}
     </div>
   );
