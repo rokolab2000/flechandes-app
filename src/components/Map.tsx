@@ -85,12 +85,19 @@ const Map: React.FC<MapProps> = ({
         const { data, error } = await supabase.functions.invoke('get-google-maps-token');
         if (error) {
           console.error('❌ Error obteniendo token de Google Maps:', error);
-        } else {
-          console.log('✅ Token de Google Maps obtenido exitosamente');
-          setGoogleMapsToken(data.token);
+          setIsLoading(false);
+          return;
         }
+        if (!data?.token) {
+          console.error('❌ No se recibió token de Google Maps');
+          setIsLoading(false);
+          return;
+        }
+        console.log('✅ Token de Google Maps obtenido exitosamente');
+        setGoogleMapsToken(data.token);
       } catch (error) {
         console.error('❌ Error:', error);
+        setIsLoading(false);
       }
     };
     
@@ -335,10 +342,21 @@ const Map: React.FC<MapProps> = ({
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-96 bg-muted rounded-lg">
+      <div className="flex items-center justify-center h-96 bg-muted rounded-lg border">
         <div className="flex flex-col items-center space-y-4">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
           <p className="text-muted-foreground">Cargando mapa...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!googleMapsToken) {
+    return (
+      <div className="flex items-center justify-center h-96 bg-muted rounded-lg border">
+        <div className="flex flex-col items-center space-y-4 text-center px-4">
+          <p className="text-destructive font-semibold">Error al cargar el mapa</p>
+          <p className="text-sm text-muted-foreground">No se pudo obtener la clave de API de Google Maps</p>
         </div>
       </div>
     );
