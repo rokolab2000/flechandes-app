@@ -1,16 +1,35 @@
-
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapPin, Home, Calendar, DollarSign } from 'lucide-react';
+import { MapPin, Home, Calendar, Calculator, AlertTriangle } from 'lucide-react';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import VehicleSelector from '@/components/VehicleSelector';
+import SpecialObjectsSelector from '@/components/quote/SpecialObjectsSelector';
+import StairsAccessSelector from '@/components/quote/StairsAccessSelector';
+import HelpersSelector from '@/components/quote/HelpersSelector';
+import QuoteBreakdownCard from '@/components/quote/QuoteBreakdownCard';
 import { useToast } from '@/hooks/use-toast';
 import { useGoogleMapsAutocomplete } from '@/hooks/useGoogleMapsAutocomplete';
 import Map from '@/components/Map';
+import { 
+  calculateQuote, 
+  isRemoteZone, 
+  SpecialObject, 
+  QuoteBreakdown,
+  SPECIAL_OBJECTS 
+} from '@/lib/pricing';
+
+const VEHICLE_NAMES: Record<string, string> = {
+  'furgon': 'Furgón',
+  'van': 'Camioneta',
+  'small-truck': 'Camión Chico',
+  'medium-truck': 'Camión Mediano',
+  'large-truck': 'Camión Grande',
+};
 
 const MovingQuoteForm = () => {
   const { toast } = useToast();
@@ -23,12 +42,25 @@ const MovingQuoteForm = () => {
     date: '',
     rooms: '',
     vehicle: 'furgon',
-    hasElevator: '',
-    hasHelpers: true,
     description: ''
   });
-  const [quote, setQuote] = useState<number | null>(null);
+
+  // Fricción Positiva - Stairs Access
+  const [originHasElevator, setOriginHasElevator] = useState<boolean | null>(null);
+  const [originFloors, setOriginFloors] = useState(1);
+  const [destHasElevator, setDestHasElevator] = useState<boolean | null>(null);
+  const [destFloors, setDestFloors] = useState(1);
+
+  // Peonetas
+  const [helpersCount, setHelpersCount] = useState(1);
+
+  // Objetos especiales
+  const [specialObjects, setSpecialObjects] = useState<SpecialObject[]>(['none']);
+
+  // Quote state
+  const [quoteBreakdown, setQuoteBreakdown] = useState<QuoteBreakdown | null>(null);
   const [routeInfo, setRouteInfo] = useState<{distance: string, duration: string} | null>(null);
+  const [distanceKm, setDistanceKm] = useState<number>(0);
 
   // Configurar autocompletado para origen
   useGoogleMapsAutocomplete(originInputRef, {
@@ -52,85 +84,120 @@ const MovingQuoteForm = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const calculateQuote = () => {
-    // Lógica básica de cotización para mudanzas
-    let basePrice = 50000; // Precio base
+  // Detectar zonas remotas
+  const isOriginRemote = useMemo(() => isRemoteZone(formData.origin), [formData.origin]);
+  const isDestRemote = useMemo(() => isRemoteZone(formData.destination), [formData.destination]);
+  const isRemote = isOriginRemote || isDestRemote;
 
-    // Precio según tipo de vehículo
-    const vehiclePrices = {
-      furgon: 50000,
-      van: 70000,
-      'small-truck': 90000,
-      'medium-truck': 120000,
-      'large-truck': 150000
-    };
+  // Calcular pisos totales
+  const totalFloors = useMemo(() => {
+    const originF = originHasElevator === false ? originFloors : 1;
+    const destF = destHasElevator === false ? destFloors : 1;
+    return Math.max(originF, destF);
+  }, [originHasElevator, originFloors, destHasElevator, destFloors]);
 
-    basePrice = vehiclePrices[formData.vehicle as keyof typeof vehiclePrices] || 50000;
+  // Verificar si necesita cuadrilla especial
+  const requiresSpecialCrew = useMemo(() => {
+    return specialObjects.some(objId => {
+      const obj = SPECIAL_OBJECTS.find(o => o.id === objId);
+      return obj?.requiresSpecialCrew;
+    });
+  }, [specialObjects]);
 
-    // Precio según número de habitaciones
-    const roomMultiplier = {
-      '1': 1,
-      '2': 1.3,
-      '3': 1.6,
-      '4': 2,
-      '5+': 2.5
-    };
+  // Recomendar ayudantes basado en habitaciones y objetos
+  const recommendedHelpers = useMemo(() => {
+    let helpers = 1;
+    if (formData.rooms === '3') helpers = 2;
+    if (formData.rooms === '4') helpers = 2;
+    if (formData.rooms === '5+') helpers = 3;
+    if (requiresSpecialCrew) helpers = Math.max(helpers, 2);
+    return helpers;
+  }, [formData.rooms, requiresSpecialCrew]);
 
-    basePrice *= roomMultiplier[formData.rooms as keyof typeof roomMultiplier] || 1;
+  const calculateQuoteHandler = () => {
+    const breakdown = calculateQuote({
+      vehicleType: formData.vehicle,
+      distanceKm: distanceKm || 5,
+      floors: totalFloors,
+      hasElevator: originHasElevator !== false && destHasElevator !== false,
+      helpersCount,
+      specialObjects: specialObjects.filter(o => o !== 'none'),
+      isRemoteZone: isRemote,
+      urgency: 'normal',
+      rooms: formData.rooms,
+    });
 
-    // Ajustes adicionales
-    if (formData.hasElevator === 'no') basePrice *= 1.2; // 20% más sin ascensor
-    if (formData.hasHelpers) basePrice *= 1.3; // 30% más con ayudantes
-
-    setQuote(Math.round(basePrice));
+    setQuoteBreakdown(breakdown);
     
     toast({
       title: "Cotización calculada",
-      description: "Tu cotización ha sido generada exitosamente",
+      description: "Tu cotización ha sido generada con el desglose completo",
     });
   };
 
   const isFormValid = formData.origin && formData.destination && formData.date && formData.rooms;
   const shouldShowMap = formData.origin && formData.destination;
 
+  const handleDistanceCalculated = (distance: string, duration: string) => {
+    setRouteInfo({ distance, duration });
+    // Extraer número de km
+    const kmMatch = distance.match(/[\d.]+/);
+    if (kmMatch) {
+      setDistanceKm(parseFloat(kmMatch[0]));
+    }
+  };
+
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Home className="h-5 w-5 text-[#009EE2]" />
+      {/* Información básica */}
+      <Card className="border-border">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <Home className="h-5 w-5 text-flechandes-secondary" />
             Información de la Mudanza
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="origin">Origen</Label>
+              <Label htmlFor="origin">Dirección de Origen</Label>
               <div className="relative">
-                <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   ref={originInputRef}
                   id="origin"
-                  placeholder="Dirección de origen"
+                  placeholder="¿Desde dónde mudas?"
                   value={formData.origin}
                   onChange={(e) => handleInputChange('origin', e.target.value)}
                   className="pl-10"
                 />
               </div>
+              {isOriginRemote && (
+                <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
+                  <AlertTriangle className="h-3 w-3" />
+                  Zona remota detectada
+                </p>
+              )}
             </div>
             <div>
-              <Label htmlFor="destination">Destino</Label>
+              <Label htmlFor="destination">Dirección de Destino</Label>
               <div className="relative">
-                <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   ref={destinationInputRef}
                   id="destination"
-                  placeholder="Dirección de destino"
+                  placeholder="¿A dónde te mudas?"
                   value={formData.destination}
                   onChange={(e) => handleInputChange('destination', e.target.value)}
                   className="pl-10"
                 />
               </div>
+              {isDestRemote && (
+                <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
+                  <AlertTriangle className="h-3 w-3" />
+                  Zona remota detectada
+                </p>
+              )}
             </div>
           </div>
 
@@ -138,13 +205,14 @@ const MovingQuoteForm = () => {
             <div>
               <Label htmlFor="date">Fecha de mudanza</Label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="date"
                   type="date"
                   value={formData.date}
                   onChange={(e) => handleInputChange('date', e.target.value)}
                   className="pl-10"
+                  min={new Date().toISOString().split('T')[0]}
                 />
               </div>
             </div>
@@ -155,7 +223,7 @@ const MovingQuoteForm = () => {
                   <SelectValue placeholder="Selecciona" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="1">1 habitación</SelectItem>
+                  <SelectItem value="1">1 habitación (estudio)</SelectItem>
                   <SelectItem value="2">2 habitaciones</SelectItem>
                   <SelectItem value="3">3 habitaciones</SelectItem>
                   <SelectItem value="4">4 habitaciones</SelectItem>
@@ -173,103 +241,105 @@ const MovingQuoteForm = () => {
               serviceType="moving"
             />
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="elevator">¿Hay ascensor disponible?</Label>
-              <Select value={formData.hasElevator} onValueChange={(value) => handleInputChange('hasElevator', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecciona" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="yes">Sí</SelectItem>
-                  <SelectItem value="no">No</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="helpers">¿Necesitas ayudantes?</Label>
-              <Select 
-                value={formData.hasHelpers ? 'yes' : 'no'} 
-                onValueChange={(value) => handleInputChange('hasHelpers', value === 'yes')}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="yes">Sí</SelectItem>
-                  <SelectItem value="no">No</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div>
-            <Label htmlFor="description">Descripción adicional (opcional)</Label>
-            <Textarea
-              id="description"
-              placeholder="Describe cualquier detalle importante sobre tu mudanza..."
-              value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-              rows={3}
-            />
-          </div>
         </CardContent>
       </Card>
 
-      <div className="flex flex-col gap-4">
-        <Button
-          onClick={calculateQuote}
-          disabled={!isFormValid}
-          className="bg-[#009EE2] hover:bg-[#0080B9] text-white py-3 text-lg"
-          size="lg"
-        >
-          <DollarSign className="h-5 w-5 mr-2" />
-          Calcular Cotización
-        </Button>
-
-        {quote && (
-          <Card className="bg-gradient-to-r from-[#009EE2]/10 to-[#DB2851]/10 border-2 border-[#009EE2]/20">
-            <CardContent className="p-6 text-center">
-              <h3 className="text-2xl font-bold text-gray-800 mb-2">Tu cotización estimada</h3>
-              <div className="text-4xl font-bold text-[#009EE2] mb-4">
-                ${quote.toLocaleString('es-CL')} CLP
-              </div>
-              <p className="text-gray-600 mb-4">
-                Esta es una estimación basada en la información proporcionada
-              </p>
-              <Button 
-                className="bg-[#DB2851] hover:bg-[#c11f45]"
-                onClick={() => window.location.href = '/customer/new-service'}
-              >
-                Solicitar Servicio
-              </Button>
-            </CardContent>
-          </Card>
-        )}
+      {/* Fricción Positiva - Acceso */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <StairsAccessSelector
+          hasElevator={originHasElevator}
+          floors={originFloors}
+          onElevatorChange={setOriginHasElevator}
+          onFloorsChange={setOriginFloors}
+          locationType="origin"
+        />
+        <StairsAccessSelector
+          hasElevator={destHasElevator}
+          floors={destFloors}
+          onElevatorChange={setDestHasElevator}
+          onFloorsChange={setDestFloors}
+          locationType="destination"
+        />
       </div>
+
+      {/* Objetos Especiales */}
+      <Card className="border-border">
+        <CardContent className="p-4">
+          <SpecialObjectsSelector
+            selectedObjects={specialObjects}
+            onSelectionChange={setSpecialObjects}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Peonetas */}
+      <HelpersSelector
+        helpersCount={helpersCount}
+        onHelpersChange={setHelpersCount}
+        recommendedHelpers={recommendedHelpers}
+      />
+
+      {/* Descripción adicional */}
+      <Card className="border-border">
+        <CardContent className="p-4">
+          <Label htmlFor="description">Descripción adicional (opcional)</Label>
+          <Textarea
+            id="description"
+            placeholder="Describe cualquier detalle importante: objetos frágiles, accesos especiales, horarios específicos..."
+            value={formData.description}
+            onChange={(e) => handleInputChange('description', e.target.value)}
+            rows={3}
+            className="mt-2"
+          />
+        </CardContent>
+      </Card>
 
       {/* Mapa con ruta */}
       {shouldShowMap && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-[#009EE2]" />
+        <Card className="border-border overflow-hidden">
+          <CardHeader className="pb-2">
+            <CardTitle className="flex items-center gap-2 text-lg">
+              <MapPin className="h-5 w-5 text-flechandes-secondary" />
               Ruta de la Mudanza
+              {routeInfo && (
+                <span className="ml-auto text-sm font-normal text-muted-foreground">
+                  {routeInfo.distance} • {routeInfo.duration}
+                </span>
+              )}
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="p-0">
             <Map
               routeData={{
                 origin: formData.origin,
                 destination: formData.destination
               }}
-              onDistanceCalculated={(distance, duration) => {
-                setRouteInfo({ distance, duration });
-              }}
+              onDistanceCalculated={handleDistanceCalculated}
             />
           </CardContent>
         </Card>
+      )}
+
+      {/* Botón de calcular */}
+      <Button
+        onClick={calculateQuoteHandler}
+        disabled={!isFormValid}
+        className="w-full bg-flechandes-secondary hover:bg-flechandes-secondary/90 text-primary-foreground py-6 text-lg font-semibold"
+        size="lg"
+      >
+        <Calculator className="h-5 w-5 mr-2" />
+        Calcular Cotización
+      </Button>
+
+      {/* Resultado de cotización */}
+      {quoteBreakdown && (
+        <QuoteBreakdownCard
+          breakdown={quoteBreakdown}
+          vehicleName={VEHICLE_NAMES[formData.vehicle] || 'Vehículo'}
+          distanceKm={distanceKm}
+          durationMinutes={routeInfo ? parseInt(routeInfo.duration) : undefined}
+          serviceType="moving"
+        />
       )}
     </div>
   );
