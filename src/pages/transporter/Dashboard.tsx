@@ -1,16 +1,23 @@
+import { useState } from 'react';
 import { useTransporterServices } from '@/hooks/useTransporterServices';
 import DashboardHeader from '@/components/transporter/DashboardHeader';
 import SearchBar from '@/components/transporter/SearchBar';
 import StatsCards from '@/components/transporter/StatsCards';
 import DashboardTabs from '@/components/transporter/DashboardTabs';
 import MobileNavbar from '@/components/MobileNavbar';
+import { DetentionTimer } from '@/components/transporter/DetentionTimer';
 import { formatCLP } from '@/lib/pricing';
 
 const TransporterDashboard = () => {
   const { availableServices, acceptedServices } = useTransporterServices();
+  const [detentionFee, setDetentionFee] = useState(0);
   
   // Calculate total potential earnings from available services
   const totalPotentialEarnings = availableServices.reduce((sum, s) => sum + s.netEarnings, 0);
+
+  const handleDetentionFeeUpdate = (fee: number, minutes: number) => {
+    setDetentionFee(fee);
+  };
   
   return (
     <div className="min-h-screen bg-muted/30">
@@ -36,6 +43,13 @@ const TransporterDashboard = () => {
         
         {/* Quick Stats */}
         <StatsCards />
+        
+        {/* Detention Timer */}
+        {acceptedServices.length > 0 && (
+          <div className="mt-6">
+            <DetentionTimer onFeeUpdate={handleDetentionFeeUpdate} />
+          </div>
+        )}
         
         {/* Services List */}
         <DashboardTabs 
