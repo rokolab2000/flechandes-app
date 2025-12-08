@@ -1,22 +1,22 @@
-
 import { useState, useEffect } from 'react';
-import Map from '@/components/Map';
-import ServiceCard from '@/components/ServiceCard';
-import ServiceDetailModal from '@/components/transporter/ServiceDetailModal';
-import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { toast } from 'sonner';
+import Map from '@/components/Map';
+import SmartOfferCard from '@/components/transporter/SmartOfferCard';
+import ServiceDetailModal from '@/components/transporter/ServiceDetailModal';
+import { TransporterService } from '@/hooks/useTransporterServices';
 
 interface DashboardTabsProps {
-  availableServices: any[];
-  acceptedServices: any[];
+  availableServices: TransporterService[];
+  acceptedServices: TransporterService[];
 }
 
 const DashboardTabs = ({ availableServices, acceptedServices }: DashboardTabsProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState<'map' | 'available' | 'accepted'>('map');
+  const [activeTab, setActiveTab] = useState<'map' | 'available' | 'accepted'>('available');
   const [routeData, setRouteData] = useState<{ origin: string; destination: string } | null>(null);
-  const [selectedService, setSelectedService] = useState<any>(null);
+  const [selectedService, setSelectedService] = useState<TransporterService | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   // Check if we should display a route on the map
@@ -24,46 +24,82 @@ const DashboardTabs = ({ availableServices, acceptedServices }: DashboardTabsPro
     if (location.state && location.state.showRoute && location.state.routeData) {
       setActiveTab('map');
       setRouteData(location.state.routeData);
-      
-      // Clear the location state after using it
       window.history.replaceState({}, document.title);
     }
   }, [location.state]);
 
+  const handleAccept = (id: string) => {
+    toast.success('¡Trabajo aceptado!', {
+      description: 'El cliente será notificado de tu aceptación.'
+    });
+  };
+
+  const handleReject = (id: string) => {
+    toast.info('Trabajo rechazado', {
+      description: 'El trabajo ha sido removido de tu lista.'
+    });
+  };
+
+  const handleCounterOffer = (id: string) => {
+    toast.info('Función próximamente', {
+      description: 'La función de contraoferta estará disponible pronto.'
+    });
+  };
+
+  const handleViewDetails = (service: TransporterService) => {
+    setSelectedService(service);
+    setIsDetailModalOpen(true);
+  };
+
+  const handleViewMap = (service: TransporterService) => {
+    setActiveTab('map');
+    setRouteData({ origin: service.origin, destination: service.destination });
+  };
+
   return (
     <>
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
+      <div className="bg-background rounded-lg shadow-sm border overflow-hidden">
         {/* Tabs */}
-        <div className="flex border-b border-gray-100">
+        <div className="flex border-b">
           <button
-            className={`flex-1 py-3 px-4 text-center font-medium ${
-              activeTab === 'map' 
-                ? 'text-move-green-600 border-b-2 border-move-green-500' 
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-            onClick={() => setActiveTab('map')}
-          >
-            Mapa
-          </button>
-          <button
-            className={`flex-1 py-3 px-4 text-center font-medium ${
+            className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
               activeTab === 'available' 
-                ? 'text-move-green-600 border-b-2 border-move-green-500' 
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'text-primary border-b-2 border-primary bg-primary/5' 
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
             }`}
             onClick={() => setActiveTab('available')}
           >
             Trabajos Disponibles
+            {availableServices.length > 0 && (
+              <span className="ml-2 bg-primary text-primary-foreground text-xs px-2 py-0.5 rounded-full">
+                {availableServices.length}
+              </span>
+            )}
           </button>
           <button
-            className={`flex-1 py-3 px-4 text-center font-medium ${
+            className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
               activeTab === 'accepted' 
-                ? 'text-move-green-600 border-b-2 border-move-green-500' 
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'text-primary border-b-2 border-primary bg-primary/5' 
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
             }`}
             onClick={() => setActiveTab('accepted')}
           >
             Mis Trabajos
+            {acceptedServices.length > 0 && (
+              <span className="ml-2 bg-secondary text-secondary-foreground text-xs px-2 py-0.5 rounded-full">
+                {acceptedServices.length}
+              </span>
+            )}
+          </button>
+          <button
+            className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
+              activeTab === 'map' 
+                ? 'text-primary border-b-2 border-primary bg-primary/5' 
+                : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+            }`}
+            onClick={() => setActiveTab('map')}
+          >
+            Mapa
           </button>
         </div>
         
@@ -79,61 +115,43 @@ const DashboardTabs = ({ availableServices, acceptedServices }: DashboardTabsPro
             </div>
           ) : (
             <div className="p-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 {activeTab === 'available' ? (
                   availableServices.length > 0 ? (
                     availableServices.map((service) => (
-                      <div key={service.id} className="relative">
-                        <ServiceCard
-                          {...service}
-                          onClick={() => navigate(`/transporter/job/${service.id}`)}
-                        />
-                        <div className="absolute bottom-4 right-4 flex gap-2">
-                          <Button 
-                            variant="outline"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedService(service);
-                              setIsDetailModalOpen(true);
-                            }}
-                          >
-                            Ver Detalles
-                          </Button>
-                          <Button 
-                            variant="outline"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setActiveTab('map');
-                              setRouteData({ origin: service.origin, destination: service.destination });
-                            }}
-                          >
-                            Ver en Mapa
-                          </Button>
-                          <Button className="bg-move-green-500 hover:bg-move-green-600">
-                            Aceptar Trabajo
-                          </Button>
-                        </div>
-                      </div>
+                      <SmartOfferCard
+                        key={service.id}
+                        service={service}
+                        onAccept={handleAccept}
+                        onReject={handleReject}
+                        onCounterOffer={handleCounterOffer}
+                        onViewDetails={handleViewDetails}
+                        onViewMap={handleViewMap}
+                      />
                     ))
                   ) : (
-                    <div className="col-span-2 py-8 text-center text-gray-500">
-                      No hay trabajos disponibles en tu área
+                    <div className="col-span-2 py-12 text-center text-muted-foreground">
+                      <p className="text-lg mb-2">No hay trabajos disponibles en tu área</p>
+                      <p className="text-sm">Revisa más tarde o amplía tu zona de cobertura</p>
                     </div>
                   )
                 ) : (
                   acceptedServices.length > 0 ? (
                     acceptedServices.map((service) => (
-                      <ServiceCard
+                      <SmartOfferCard
                         key={service.id}
-                        {...service}
-                        onClick={() => navigate(`/transporter/job/${service.id}`)}
+                        service={service}
+                        onAccept={handleAccept}
+                        onReject={handleReject}
+                        onCounterOffer={handleCounterOffer}
+                        onViewDetails={handleViewDetails}
+                        onViewMap={handleViewMap}
                       />
                     ))
                   ) : (
-                    <div className="col-span-2 py-8 text-center text-gray-500">
-                      No has aceptado ningún trabajo aún
+                    <div className="col-span-2 py-12 text-center text-muted-foreground">
+                      <p className="text-lg mb-2">No has aceptado ningún trabajo aún</p>
+                      <p className="text-sm">Revisa los trabajos disponibles y acepta uno</p>
                     </div>
                   )
                 )}
@@ -151,6 +169,9 @@ const DashboardTabs = ({ availableServices, acceptedServices }: DashboardTabsPro
           setIsDetailModalOpen(false);
           setSelectedService(null);
         }}
+        onAccept={handleAccept}
+        onReject={handleReject}
+        onCounterOffer={handleCounterOffer}
       />
     </>
   );
