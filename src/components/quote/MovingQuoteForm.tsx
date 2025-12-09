@@ -1,16 +1,29 @@
-
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapPin, Home, Calendar, DollarSign } from 'lucide-react';
+import { MapPin, Home, Calendar, DollarSign, AlertTriangle } from 'lucide-react';
 import VehicleSelector from '@/components/VehicleSelector';
 import { useToast } from '@/hooks/use-toast';
 import { useGoogleMapsAutocomplete } from '@/hooks/useGoogleMapsAutocomplete';
 import Map from '@/components/Map';
+import SpecialObjectsSelector from './SpecialObjectsSelector';
+import AccessSelector from './AccessSelector';
+import HelpersSelector from './HelpersSelector';
+import QuoteBreakdownCard from './QuoteBreakdownCard';
+import { 
+  calculateQuote, 
+  generateRiskTags, 
+  QuoteBreakdown, 
+  RiskTag,
+  VehicleType,
+  SpecialObject,
+  AccessInfo,
+  QuoteInput
+} from '@/lib/pricingEngine';
 
 const MovingQuoteForm = () => {
   const { toast } = useToast();
@@ -22,15 +35,30 @@ const MovingQuoteForm = () => {
     destination: '',
     date: '',
     rooms: '',
-    vehicle: 'furgon',
-    hasElevator: '',
-    hasHelpers: true,
+    vehicle: 'furgon' as VehicleType,
     description: ''
   });
-  const [quote, setQuote] = useState<number | null>(null);
+  
+  // Friction positive fields
+  const [specialObjects, setSpecialObjects] = useState<SpecialObject[]>([]);
+  const [originAccess, setOriginAccess] = useState<AccessInfo>({ hasElevator: true, floor: 1 });
+  const [destinationAccess, setDestinationAccess] = useState<AccessInfo>({ hasElevator: true, floor: 1 });
+  const [helpersCount, setHelpersCount] = useState(0);
+  
+  const [distanceKm, setDistanceKm] = useState<number>(0);
+  const [quoteResult, setQuoteResult] = useState<{ breakdown: QuoteBreakdown; riskTags: RiskTag[] } | null>(null);
   const [routeInfo, setRouteInfo] = useState<{distance: string, duration: string} | null>(null);
 
-  // Configurar autocompletado para origen
+  // Vehicle type mapping
+  const vehicleMap: Record<string, VehicleType> = {
+    'furgon': 'furgon',
+    'van': 'camioneta',
+    'small-truck': 'camion_chico',
+    'medium-truck': 'camion_mediano',
+    'large-truck': 'camion_grande'
+  };
+
+  // Configure autocomplete for origin
   useGoogleMapsAutocomplete(originInputRef, {
     onPlaceSelected: (place) => {
       if (place.formatted_address) {
@@ -39,7 +67,7 @@ const MovingQuoteForm = () => {
     }
   });
 
-  // Configurar autocompletado para destino
+  // Configure autocomplete for destination
   useGoogleMapsAutocomplete(destinationInputRef, {
     onPlaceSelected: (place) => {
       if (place.formatted_address) {
@@ -52,62 +80,62 @@ const MovingQuoteForm = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const calculateQuote = () => {
-    // Lógica básica de cotización para mudanzas
-    let basePrice = 50000; // Precio base
-
-    // Precio según tipo de vehículo
-    const vehiclePrices = {
-      furgon: 50000,
-      van: 70000,
-      'small-truck': 90000,
-      'medium-truck': 120000,
-      'large-truck': 150000
+  const calculateQuoteHandler = () => {
+    const input: QuoteInput = {
+      vehicleType: vehicleMap[formData.vehicle] || 'furgon',
+      distanceKm: distanceKm,
+      isRemoteZone: false, // TODO: Detect from geocoding
+      originAccess,
+      destinationAccess,
+      helpersCount,
+      specialObjects,
+      isB2B: false
     };
 
-    basePrice = vehiclePrices[formData.vehicle as keyof typeof vehiclePrices] || 50000;
-
-    // Precio según número de habitaciones
-    const roomMultiplier = {
-      '1': 1,
-      '2': 1.3,
-      '3': 1.6,
-      '4': 2,
-      '5+': 2.5
-    };
-
-    basePrice *= roomMultiplier[formData.rooms as keyof typeof roomMultiplier] || 1;
-
-    // Ajustes adicionales
-    if (formData.hasElevator === 'no') basePrice *= 1.2; // 20% más sin ascensor
-    if (formData.hasHelpers) basePrice *= 1.3; // 30% más con ayudantes
-
-    setQuote(Math.round(basePrice));
+    const breakdown = calculateQuote(input);
+    const riskTags = generateRiskTags(input);
+    
+    setQuoteResult({ breakdown, riskTags });
     
     toast({
       title: "Cotización calculada",
-      description: "Tu cotización ha sido generada exitosamente",
+      description: `Total estimado: $${breakdown.total.toLocaleString('es-CL')} CLP`,
     });
+  };
+
+  const handleDistanceCalculated = (distance: string, duration: string) => {
+    setRouteInfo({ distance, duration });
+    // Extract km from distance string (e.g., "15.3 km" -> 15.3)
+    const kmMatch = distance.match(/[\d.]+/);
+    if (kmMatch) {
+      setDistanceKm(parseFloat(kmMatch[0]));
+    }
   };
 
   const isFormValid = formData.origin && formData.destination && formData.date && formData.rooms;
   const shouldShowMap = formData.origin && formData.destination;
+  
+  // Check if high-risk items are selected
+  const hasHighRisk = specialObjects.includes('piano') || specialObjects.includes('safe');
+  const hasStairsIssue = (!originAccess.hasElevator && originAccess.floor >= 3) || 
+                         (!destinationAccess.hasElevator && destinationAccess.floor >= 3);
 
   return (
     <div className="space-y-6">
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Home className="h-5 w-5 text-[#009EE2]" />
+            <Home className="h-5 w-5 text-primary" />
             Información de la Mudanza
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
+          {/* Location inputs */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="origin">Origen</Label>
               <div className="relative">
-                <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   ref={originInputRef}
                   id="origin"
@@ -121,7 +149,7 @@ const MovingQuoteForm = () => {
             <div>
               <Label htmlFor="destination">Destino</Label>
               <div className="relative">
-                <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   ref={destinationInputRef}
                   id="destination"
@@ -134,11 +162,12 @@ const MovingQuoteForm = () => {
             </div>
           </div>
 
+          {/* Date and rooms */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="date">Fecha de mudanza</Label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="date"
                   type="date"
@@ -165,6 +194,7 @@ const MovingQuoteForm = () => {
             </div>
           </div>
 
+          {/* Vehicle selector */}
           <div>
             <Label>Tipo de vehículo</Label>
             <VehicleSelector
@@ -173,89 +203,76 @@ const MovingQuoteForm = () => {
               serviceType="moving"
             />
           </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <Label htmlFor="elevator">¿Hay ascensor disponible?</Label>
-              <Select value={formData.hasElevator} onValueChange={(value) => handleInputChange('hasElevator', value)}>
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecciona" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="yes">Sí</SelectItem>
-                  <SelectItem value="no">No</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="helpers">¿Necesitas ayudantes?</Label>
-              <Select 
-                value={formData.hasHelpers ? 'yes' : 'no'} 
-                onValueChange={(value) => handleInputChange('hasHelpers', value === 'yes')}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="yes">Sí</SelectItem>
-                  <SelectItem value="no">No</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <div>
-            <Label htmlFor="description">Descripción adicional (opcional)</Label>
-            <Textarea
-              id="description"
-              placeholder="Describe cualquier detalle importante sobre tu mudanza..."
-              value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-              rows={3}
-            />
-          </div>
         </CardContent>
       </Card>
 
-      <div className="flex flex-col gap-4">
-        <Button
-          onClick={calculateQuote}
-          disabled={!isFormValid}
-          className="bg-[#009EE2] hover:bg-[#0080B9] text-white py-3 text-lg"
-          size="lg"
-        >
-          <DollarSign className="h-5 w-5 mr-2" />
-          Calcular Cotización
-        </Button>
+      {/* Positive Friction Section */}
+      <Card className="border-2 border-dashed border-amber-300 bg-amber-50/50">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <AlertTriangle className="h-5 w-5 text-amber-600" />
+            Detalles Importantes
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Esta información nos ayuda a calcular un precio justo y preparar al equipo
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Special Objects Selector */}
+          <SpecialObjectsSelector 
+            selected={specialObjects}
+            onChange={setSpecialObjects}
+          />
 
-        {quote && (
-          <Card className="bg-gradient-to-r from-[#009EE2]/10 to-[#DB2851]/10 border-2 border-[#009EE2]/20">
-            <CardContent className="p-6 text-center">
-              <h3 className="text-2xl font-bold text-gray-800 mb-2">Tu cotización estimada</h3>
-              <div className="text-4xl font-bold text-[#009EE2] mb-4">
-                ${quote.toLocaleString('es-CL')} CLP
-              </div>
-              <p className="text-gray-600 mb-4">
-                Esta es una estimación basada en la información proporcionada
-              </p>
-              <Button 
-                className="bg-[#DB2851] hover:bg-[#c11f45]"
-                onClick={() => window.location.href = '/customer/new-service'}
-              >
-                Solicitar Servicio
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+          {/* Access Info */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <AccessSelector
+              label="Acceso en Origen"
+              value={originAccess}
+              onChange={setOriginAccess}
+            />
+            <AccessSelector
+              label="Acceso en Destino"
+              value={destinationAccess}
+              onChange={setDestinationAccess}
+            />
+          </div>
 
-      {/* Mapa con ruta */}
+          {/* Helpers Selector */}
+          <HelpersSelector
+            value={helpersCount}
+            onChange={setHelpersCount}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Additional description */}
+      <Card>
+        <CardContent className="pt-6">
+          <Label htmlFor="description">Descripción adicional (opcional)</Label>
+          <Textarea
+            id="description"
+            placeholder="Describe cualquier detalle importante sobre tu mudanza..."
+            value={formData.description}
+            onChange={(e) => handleInputChange('description', e.target.value)}
+            rows={3}
+            className="mt-2"
+          />
+        </CardContent>
+      </Card>
+
+      {/* Map with route */}
       {shouldShowMap && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-[#009EE2]" />
+              <MapPin className="h-5 w-5 text-primary" />
               Ruta de la Mudanza
+              {routeInfo && (
+                <span className="text-sm font-normal text-muted-foreground ml-auto">
+                  {routeInfo.distance} • {routeInfo.duration}
+                </span>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -264,12 +281,30 @@ const MovingQuoteForm = () => {
                 origin: formData.origin,
                 destination: formData.destination
               }}
-              onDistanceCalculated={(distance, duration) => {
-                setRouteInfo({ distance, duration });
-              }}
+              onDistanceCalculated={handleDistanceCalculated}
             />
           </CardContent>
         </Card>
+      )}
+
+      {/* Calculate button */}
+      <Button
+        onClick={calculateQuoteHandler}
+        disabled={!isFormValid}
+        className="w-full py-6 text-lg"
+        size="lg"
+      >
+        <DollarSign className="h-5 w-5 mr-2" />
+        Calcular Cotización
+      </Button>
+
+      {/* Quote Result */}
+      {quoteResult && (
+        <QuoteBreakdownCard
+          breakdown={quoteResult.breakdown}
+          riskTags={quoteResult.riskTags}
+          serviceType="moving"
+        />
       )}
     </div>
   );

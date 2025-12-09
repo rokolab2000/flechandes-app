@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,11 +5,25 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapPin, Package, Calendar, DollarSign } from 'lucide-react';
+import { MapPin, Package, Calendar, DollarSign, AlertTriangle } from 'lucide-react';
 import VehicleSelector from '@/components/VehicleSelector';
 import { useToast } from '@/hooks/use-toast';
 import { useGoogleMapsAutocomplete } from '@/hooks/useGoogleMapsAutocomplete';
 import Map from '@/components/Map';
+import SpecialObjectsSelector from './SpecialObjectsSelector';
+import AccessSelector from './AccessSelector';
+import HelpersSelector from './HelpersSelector';
+import QuoteBreakdownCard from './QuoteBreakdownCard';
+import { 
+  calculateQuote, 
+  generateRiskTags, 
+  QuoteBreakdown, 
+  RiskTag,
+  VehicleType,
+  SpecialObject,
+  AccessInfo,
+  QuoteInput
+} from '@/lib/pricingEngine';
 
 const FreightQuoteForm = () => {
   const { toast } = useToast();
@@ -23,15 +36,32 @@ const FreightQuoteForm = () => {
     date: '',
     weight: '',
     dimensions: '',
-    vehicle: 'furgon',
+    vehicle: 'furgon' as VehicleType,
     cargoType: '',
     urgency: 'normal',
     description: ''
   });
-  const [quote, setQuote] = useState<number | null>(null);
+  
+  // Friction positive fields
+  const [specialObjects, setSpecialObjects] = useState<SpecialObject[]>([]);
+  const [originAccess, setOriginAccess] = useState<AccessInfo>({ hasElevator: true, floor: 1 });
+  const [destinationAccess, setDestinationAccess] = useState<AccessInfo>({ hasElevator: true, floor: 1 });
+  const [helpersCount, setHelpersCount] = useState(0);
+  
+  const [distanceKm, setDistanceKm] = useState<number>(0);
+  const [quoteResult, setQuoteResult] = useState<{ breakdown: QuoteBreakdown; riskTags: RiskTag[] } | null>(null);
   const [routeInfo, setRouteInfo] = useState<{distance: string, duration: string} | null>(null);
 
-  // Configurar autocompletado para origen
+  // Vehicle type mapping
+  const vehicleMap: Record<string, VehicleType> = {
+    'furgon': 'furgon',
+    'van': 'camioneta',
+    'small-truck': 'camion_chico',
+    'medium-truck': 'camion_mediano',
+    'large-truck': 'camion_grande'
+  };
+
+  // Configure autocomplete for origin
   useGoogleMapsAutocomplete(originInputRef, {
     onPlaceSelected: (place) => {
       if (place.formatted_address) {
@@ -40,7 +70,7 @@ const FreightQuoteForm = () => {
     }
   });
 
-  // Configurar autocompletado para destino
+  // Configure autocomplete for destination
   useGoogleMapsAutocomplete(destinationInputRef, {
     onPlaceSelected: (place) => {
       if (place.formatted_address) {
@@ -53,41 +83,35 @@ const FreightQuoteForm = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const calculateQuote = () => {
-    // Lógica básica de cotización para fletes
-    let basePrice = 25000; // Precio base
-
-    // Precio según tipo de vehículo
-    const vehiclePrices = {
-      furgon: 25000,
-      van: 35000,
-      'small-truck': 45000,
-      'medium-truck': 60000,
-      'large-truck': 80000
+  const calculateQuoteHandler = () => {
+    const input: QuoteInput = {
+      vehicleType: vehicleMap[formData.vehicle] || 'furgon',
+      distanceKm: distanceKm,
+      isRemoteZone: false,
+      originAccess,
+      destinationAccess,
+      helpersCount,
+      specialObjects,
+      isB2B: false
     };
 
-    basePrice = vehiclePrices[formData.vehicle as keyof typeof vehiclePrices] || 25000;
-
-    // Precio según peso
-    const weight = parseFloat(formData.weight) || 0;
-    if (weight > 100) basePrice *= 1.5;
-    else if (weight > 50) basePrice *= 1.3;
-    else if (weight > 20) basePrice *= 1.1;
-
-    // Precio según urgencia
-    if (formData.urgency === 'urgent') basePrice *= 1.4;
-    else if (formData.urgency === 'express') basePrice *= 1.8;
-
-    // Precio según tipo de carga
-    if (formData.cargoType === 'fragile') basePrice *= 1.2;
-    else if (formData.cargoType === 'dangerous') basePrice *= 1.5;
-
-    setQuote(Math.round(basePrice));
+    const breakdown = calculateQuote(input);
+    const riskTags = generateRiskTags(input);
+    
+    setQuoteResult({ breakdown, riskTags });
     
     toast({
       title: "Cotización calculada",
-      description: "Tu cotización ha sido generada exitosamente",
+      description: `Total estimado: $${breakdown.total.toLocaleString('es-CL')} CLP`,
     });
+  };
+
+  const handleDistanceCalculated = (distance: string, duration: string) => {
+    setRouteInfo({ distance, duration });
+    const kmMatch = distance.match(/[\d.]+/);
+    if (kmMatch) {
+      setDistanceKm(parseFloat(kmMatch[0]));
+    }
   };
 
   const isFormValid = formData.origin && formData.destination && formData.date && formData.weight;
@@ -102,12 +126,13 @@ const FreightQuoteForm = () => {
             Información del Flete
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
+          {/* Location inputs */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="origin">Origen</Label>
               <div className="relative">
-                <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   ref={originInputRef}
                   id="origin"
@@ -121,7 +146,7 @@ const FreightQuoteForm = () => {
             <div>
               <Label htmlFor="destination">Destino</Label>
               <div className="relative">
-                <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   ref={destinationInputRef}
                   id="destination"
@@ -134,11 +159,12 @@ const FreightQuoteForm = () => {
             </div>
           </div>
 
+          {/* Date and weight */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="date">Fecha de transporte</Label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                 <Input
                   id="date"
                   type="date"
@@ -170,6 +196,7 @@ const FreightQuoteForm = () => {
             />
           </div>
 
+          {/* Vehicle selector */}
           <div>
             <Label>Tipo de vehículo</Label>
             <VehicleSelector
@@ -179,6 +206,7 @@ const FreightQuoteForm = () => {
             />
           </div>
 
+          {/* Cargo type and urgency */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <Label htmlFor="cargoType">Tipo de carga</Label>
@@ -209,59 +237,76 @@ const FreightQuoteForm = () => {
               </Select>
             </div>
           </div>
-
-          <div>
-            <Label htmlFor="description">Descripción adicional (opcional)</Label>
-            <Textarea
-              id="description"
-              placeholder="Describe tu carga y cualquier detalle importante..."
-              value={formData.description}
-              onChange={(e) => handleInputChange('description', e.target.value)}
-              rows={3}
-            />
-          </div>
         </CardContent>
       </Card>
 
-      <div className="flex flex-col gap-4">
-        <Button
-          onClick={calculateQuote}
-          disabled={!isFormValid}
-          className="bg-[#DB2851] hover:bg-[#c11f45] text-white py-3 text-lg"
-          size="lg"
-        >
-          <DollarSign className="h-5 w-5 mr-2" />
-          Calcular Cotización
-        </Button>
+      {/* Positive Friction Section */}
+      <Card className="border-2 border-dashed border-amber-300 bg-amber-50/50">
+        <CardHeader className="pb-2">
+          <CardTitle className="flex items-center gap-2 text-lg">
+            <AlertTriangle className="h-5 w-5 text-amber-600" />
+            Detalles de Acceso y Carga
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Información importante para preparar correctamente el servicio
+          </p>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Special Objects Selector */}
+          <SpecialObjectsSelector 
+            selected={specialObjects}
+            onChange={setSpecialObjects}
+          />
 
-        {quote && (
-          <Card className="bg-gradient-to-r from-[#DB2851]/10 to-[#009EE2]/10 border-2 border-[#DB2851]/20">
-            <CardContent className="p-6 text-center">
-              <h3 className="text-2xl font-bold text-gray-800 mb-2">Tu cotización estimada</h3>
-              <div className="text-4xl font-bold text-[#DB2851] mb-4">
-                ${quote.toLocaleString('es-CL')} CLP
-              </div>
-              <p className="text-gray-600 mb-4">
-                Esta es una estimación basada en la información proporcionada
-              </p>
-              <Button 
-                className="bg-[#009EE2] hover:bg-[#0080B9]"
-                onClick={() => window.location.href = '/customer/new-service'}
-              >
-                Solicitar Servicio
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-      </div>
+          {/* Access Info */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <AccessSelector
+              label="Acceso en Origen"
+              value={originAccess}
+              onChange={setOriginAccess}
+            />
+            <AccessSelector
+              label="Acceso en Destino"
+              value={destinationAccess}
+              onChange={setDestinationAccess}
+            />
+          </div>
 
-      {/* Mapa con ruta */}
+          {/* Helpers Selector */}
+          <HelpersSelector
+            value={helpersCount}
+            onChange={setHelpersCount}
+          />
+        </CardContent>
+      </Card>
+
+      {/* Additional description */}
+      <Card>
+        <CardContent className="pt-6">
+          <Label htmlFor="description">Descripción adicional (opcional)</Label>
+          <Textarea
+            id="description"
+            placeholder="Describe tu carga y cualquier detalle importante..."
+            value={formData.description}
+            onChange={(e) => handleInputChange('description', e.target.value)}
+            rows={3}
+            className="mt-2"
+          />
+        </CardContent>
+      </Card>
+
+      {/* Map with route */}
       {shouldShowMap && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <MapPin className="h-5 w-5 text-[#009EE2]" />
+              <MapPin className="h-5 w-5 text-[#DB2851]" />
               Ruta del Flete
+              {routeInfo && (
+                <span className="text-sm font-normal text-muted-foreground ml-auto">
+                  {routeInfo.distance} • {routeInfo.duration}
+                </span>
+              )}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -270,12 +315,30 @@ const FreightQuoteForm = () => {
                 origin: formData.origin,
                 destination: formData.destination
               }}
-              onDistanceCalculated={(distance, duration) => {
-                setRouteInfo({ distance, duration });
-              }}
+              onDistanceCalculated={handleDistanceCalculated}
             />
           </CardContent>
         </Card>
+      )}
+
+      {/* Calculate button */}
+      <Button
+        onClick={calculateQuoteHandler}
+        disabled={!isFormValid}
+        className="w-full py-6 text-lg bg-[#DB2851] hover:bg-[#c11f45]"
+        size="lg"
+      >
+        <DollarSign className="h-5 w-5 mr-2" />
+        Calcular Cotización
+      </Button>
+
+      {/* Quote Result */}
+      {quoteResult && (
+        <QuoteBreakdownCard
+          breakdown={quoteResult.breakdown}
+          riskTags={quoteResult.riskTags}
+          serviceType="freight"
+        />
       )}
     </div>
   );
