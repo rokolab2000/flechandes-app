@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { MessageCircle, Send, Bot, User, Loader2, X, Minimize2, Maximize2 } from 'lucide-react';
+import { MessageCircle, Send, Bot, User, Loader2, X, Minimize2, Maximize2, Truck, Package, DollarSign } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 type Message = {
@@ -12,6 +12,12 @@ type Message = {
 };
 
 const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/quote-chat`;
+
+const QUICK_SUGGESTIONS = [
+  { label: 'Cotizar mudanza', icon: Truck, message: 'Quiero cotizar una mudanza' },
+  { label: 'Cotizar flete', icon: Package, message: 'Necesito cotizar un flete' },
+  { label: 'Ver precios', icon: DollarSign, message: '¿Cuáles son los precios base para los diferentes vehículos?' },
+];
 
 const QuoteChat = () => {
   const [messages, setMessages] = useState<Message[]>([
@@ -109,10 +115,11 @@ const QuoteChat = () => {
     }
   };
 
-  const handleSend = async () => {
-    if (!input.trim() || isLoading) return;
+  const handleSend = async (messageText?: string) => {
+    const text = messageText || input.trim();
+    if (!text || isLoading) return;
 
-    const userMessage: Message = { role: 'user', content: input.trim() };
+    const userMessage: Message = { role: 'user', content: text };
     const newMessages = [...messages, userMessage];
     setMessages(newMessages);
     setInput('');
@@ -130,6 +137,10 @@ const QuoteChat = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleQuickSuggestion = (message: string) => {
+    handleSend(message);
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -223,6 +234,24 @@ const QuoteChat = () => {
                 </div>
               )}
             </div>
+
+            {/* Quick Suggestions - Show only at the beginning */}
+            {messages.length === 1 && !isLoading && (
+              <div className="mt-4 flex flex-wrap gap-2">
+                {QUICK_SUGGESTIONS.map((suggestion, index) => (
+                  <Button
+                    key={index}
+                    variant="outline"
+                    size="sm"
+                    className="text-xs gap-1.5 bg-background hover:bg-primary/10 border-primary/20 text-foreground"
+                    onClick={() => handleQuickSuggestion(suggestion.message)}
+                  >
+                    <suggestion.icon className="h-3.5 w-3.5 text-primary" />
+                    {suggestion.label}
+                  </Button>
+                ))}
+              </div>
+            )}
           </ScrollArea>
 
           <div className="p-3 border-t">
@@ -237,7 +266,7 @@ const QuoteChat = () => {
                 className="flex-1"
               />
               <Button
-                onClick={handleSend}
+                onClick={() => handleSend()}
                 disabled={!input.trim() || isLoading}
                 size="icon"
                 className="bg-primary hover:bg-primary/90"
