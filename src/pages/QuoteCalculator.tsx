@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -7,7 +8,6 @@ import { useNavigate } from 'react-router-dom';
 import Logo from '@/components/Logo';
 import MovingQuoteForm from '@/components/quote/MovingQuoteForm';
 import FreightQuoteForm from '@/components/quote/FreightQuoteForm';
-import QuoteChat from '@/components/quote/QuoteChat';
 
 const QuoteCalculator = () => {
   const navigate = useNavigate();
@@ -188,9 +188,6 @@ const QuoteCalculator = () => {
           </div>
         </div>
       </div>
-
-      {/* Chat Conversacional */}
-      <QuoteChat />
     </div>
   );
 };

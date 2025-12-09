@@ -1,146 +1,56 @@
 
 import { useState } from 'react';
 
-export interface ServiceRiskFactors {
-  hasHeavyObjects: boolean;
-  heavyObjectType?: 'piano' | 'safe' | 'other';
-  hasFragileItems: boolean;
-  floors: number;
-  hasElevator: boolean;
-  helpersRequired: number;
-  helpersPaid: number;
-}
-
-export interface TransporterService {
+interface Service {
   id: string;
   title: string;
-  type: 'moving' | 'freight';
+  type: 'moving' | 'delivery' | 'freight';
   status: 'pending' | 'confirmed' | 'in-progress' | 'completed';
-  grossPrice: number;
-  netEarnings: number;
-  platformFee: number;
+  price: number;
   origin: string;
   destination: string;
   date: string;
   time: string;
-  distance: number;
-  vehicleType: string;
-  riskFactors: ServiceRiskFactors;
-  clientName: string;
-  clientPhone: string;
-  notes?: string;
 }
 
 export function useTransporterServices() {
-  const [availableServices] = useState<TransporterService[]>([
+  // Datos de ejemplo para servicios
+  const [availableServices] = useState<Service[]>([
     {
       id: '1',
-      title: 'Mudanza Departamento Las Condes',
+      title: 'Mudanza de Apartamento',
       type: 'moving',
       status: 'pending',
-      grossPrice: 185000,
-      netEarnings: 157250,
-      platformFee: 27750,
-      origin: 'Av. Apoquindo 4500, Las Condes',
-      destination: 'Av. Vitacura 2800, Vitacura',
-      date: '15 Dic, 2024',
-      time: '09:00',
-      distance: 8.5,
-      vehicleType: 'camion_chico',
-      riskFactors: {
-        hasHeavyObjects: true,
-        heavyObjectType: 'piano',
-        hasFragileItems: true,
-        floors: 4,
-        hasElevator: false,
-        helpersRequired: 2,
-        helpersPaid: 2
-      },
-      clientName: 'María González',
-      clientPhone: '+56 9 8765 4321',
-      notes: 'Piano vertical en buen estado. Requiere cuidado especial con cristalería antigua.'
+      price: 280.00,
+      origin: '123 Primera Ave, Madrid',
+      destination: '456 Segunda Calle, Madrid',
+      date: '20 Jun, 2024',
+      time: '10:00 AM'
     },
     {
       id: '2',
-      title: 'Flete Muebles Providencia',
-      type: 'freight',
+      title: 'Entrega de Muebles',
+      type: 'delivery',
       status: 'pending',
-      grossPrice: 65000,
-      netEarnings: 55250,
-      platformFee: 9750,
-      origin: 'Tienda HomeCenter, Providencia',
-      destination: 'Manuel Montt 1200, Providencia',
-      date: '16 Dic, 2024',
-      time: '14:00',
-      distance: 3.2,
-      vehicleType: 'furgon',
-      riskFactors: {
-        hasHeavyObjects: false,
-        hasFragileItems: false,
-        floors: 2,
-        hasElevator: true,
-        helpersRequired: 1,
-        helpersPaid: 1
-      },
-      clientName: 'Carlos Pérez',
-      clientPhone: '+56 9 1234 5678',
-      notes: 'Sofá y mesa de comedor. Edificio con estacionamiento subterráneo.'
-    },
-    {
-      id: '3',
-      title: 'Mudanza Oficina Santiago Centro',
-      type: 'moving',
-      status: 'pending',
-      grossPrice: 320000,
-      netEarnings: 272000,
-      platformFee: 48000,
-      origin: 'Morandé 80, Santiago',
-      destination: 'Av. Libertador O\'Higgins 1449, Santiago',
-      date: '18 Dic, 2024',
-      time: '07:00',
-      distance: 2.1,
-      vehicleType: 'camion_mediano',
-      riskFactors: {
-        hasHeavyObjects: true,
-        heavyObjectType: 'safe',
-        hasFragileItems: true,
-        floors: 6,
-        hasElevator: false,
-        helpersRequired: 4,
-        helpersPaid: 4
-      },
-      clientName: 'Empresa ABC Ltda.',
-      clientPhone: '+56 2 2345 6789',
-      notes: 'Caja fuerte de 500kg. Requiere equipo especializado. Acceso por calle lateral.'
+      price: 120.00,
+      origin: 'Tienda de Muebles, Madrid',
+      destination: '789 Tercera Ave, Madrid',
+      date: '25 Jun, 2024',
+      time: '13:00 PM'
     }
   ]);
   
-  const [acceptedServices] = useState<TransporterService[]>([
+  const [acceptedServices] = useState<Service[]>([
     {
-      id: '4',
-      title: 'Flete Electrodomésticos Ñuñoa',
+      id: '3',
+      title: 'Equipamiento de Oficina',
       type: 'freight',
       status: 'confirmed',
-      grossPrice: 45000,
-      netEarnings: 38250,
-      platformFee: 6750,
-      origin: 'Ripley Alto Las Condes',
-      destination: 'Irarrázaval 3500, Ñuñoa',
-      date: '14 Dic, 2024',
-      time: '11:00',
-      distance: 12.3,
-      vehicleType: 'camioneta',
-      riskFactors: {
-        hasHeavyObjects: false,
-        hasFragileItems: true,
-        floors: 1,
-        hasElevator: false,
-        helpersRequired: 1,
-        helpersPaid: 0
-      },
-      clientName: 'Andrea Silva',
-      clientPhone: '+56 9 5555 1234',
-      notes: 'Refrigerador y lavadora. Casa con acceso directo.'
+      price: 350.00,
+      origin: '101 Bulevar Empresarial, Madrid',
+      destination: '202 Calle Comercio, Madrid',
+      date: '18 Jun, 2024',
+      time: '08:00 AM'
     }
   ]);
 

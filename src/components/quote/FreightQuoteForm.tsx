@@ -1,32 +1,16 @@
-import React, { useState, useRef, useMemo } from 'react';
+
+import React, { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { MapPin, Package, Calendar, Calculator, AlertTriangle, Scale } from 'lucide-react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { MapPin, Package, Calendar, DollarSign } from 'lucide-react';
 import VehicleSelector from '@/components/VehicleSelector';
-import StairsAccessSelector from '@/components/quote/StairsAccessSelector';
-import HelpersSelector from '@/components/quote/HelpersSelector';
-import QuoteBreakdownCard from '@/components/quote/QuoteBreakdownCard';
 import { useToast } from '@/hooks/use-toast';
 import { useGoogleMapsAutocomplete } from '@/hooks/useGoogleMapsAutocomplete';
 import Map from '@/components/Map';
-import { 
-  calculateQuote, 
-  isRemoteZone, 
-  QuoteBreakdown 
-} from '@/lib/pricing';
-
-const VEHICLE_NAMES: Record<string, string> = {
-  'furgon': 'Furgón',
-  'van': 'Camioneta',
-  'small-truck': 'Camión Chico',
-  'medium-truck': 'Camión Mediano',
-  'large-truck': 'Camión Grande',
-};
 
 const FreightQuoteForm = () => {
   const { toast } = useToast();
@@ -40,22 +24,12 @@ const FreightQuoteForm = () => {
     weight: '',
     dimensions: '',
     vehicle: 'furgon',
-    cargoType: 'normal',
+    cargoType: '',
     urgency: 'normal',
     description: ''
   });
-
-  // Fricción Positiva - Stairs Access
-  const [destHasElevator, setDestHasElevator] = useState<boolean | null>(null);
-  const [destFloors, setDestFloors] = useState(1);
-
-  // Peonetas
-  const [helpersCount, setHelpersCount] = useState(0);
-
-  // Quote state
-  const [quoteBreakdown, setQuoteBreakdown] = useState<QuoteBreakdown | null>(null);
+  const [quote, setQuote] = useState<number | null>(null);
   const [routeInfo, setRouteInfo] = useState<{distance: string, duration: string} | null>(null);
-  const [distanceKm, setDistanceKm] = useState<number>(0);
 
   // Configurar autocompletado para origen
   useGoogleMapsAutocomplete(originInputRef, {
@@ -79,106 +53,84 @@ const FreightQuoteForm = () => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  // Detectar zonas remotas
-  const isOriginRemote = useMemo(() => isRemoteZone(formData.origin), [formData.origin]);
-  const isDestRemote = useMemo(() => isRemoteZone(formData.destination), [formData.destination]);
-  const isRemote = isOriginRemote || isDestRemote;
+  const calculateQuote = () => {
+    // Lógica básica de cotización para fletes
+    let basePrice = 25000; // Precio base
 
-  // Peso en kg
-  const weightKg = useMemo(() => parseFloat(formData.weight) || 0, [formData.weight]);
+    // Precio según tipo de vehículo
+    const vehiclePrices = {
+      furgon: 25000,
+      van: 35000,
+      'small-truck': 45000,
+      'medium-truck': 60000,
+      'large-truck': 80000
+    };
 
-  // Recomendar ayudantes basado en peso
-  const recommendedHelpers = useMemo(() => {
-    if (weightKg > 100) return 2;
-    if (weightKg > 50) return 1;
-    return 0;
-  }, [weightKg]);
+    basePrice = vehiclePrices[formData.vehicle as keyof typeof vehiclePrices] || 25000;
 
-  const calculateQuoteHandler = () => {
-    const breakdown = calculateQuote({
-      vehicleType: formData.vehicle,
-      distanceKm: distanceKm || 5,
-      floors: destHasElevator === false ? destFloors : 1,
-      hasElevator: destHasElevator !== false,
-      helpersCount,
-      specialObjects: [],
-      isRemoteZone: isRemote,
-      urgency: formData.urgency as 'normal' | 'urgent' | 'express',
-      cargoType: formData.cargoType,
-      weightKg,
-    });
+    // Precio según peso
+    const weight = parseFloat(formData.weight) || 0;
+    if (weight > 100) basePrice *= 1.5;
+    else if (weight > 50) basePrice *= 1.3;
+    else if (weight > 20) basePrice *= 1.1;
 
-    setQuoteBreakdown(breakdown);
+    // Precio según urgencia
+    if (formData.urgency === 'urgent') basePrice *= 1.4;
+    else if (formData.urgency === 'express') basePrice *= 1.8;
+
+    // Precio según tipo de carga
+    if (formData.cargoType === 'fragile') basePrice *= 1.2;
+    else if (formData.cargoType === 'dangerous') basePrice *= 1.5;
+
+    setQuote(Math.round(basePrice));
     
     toast({
       title: "Cotización calculada",
-      description: "Tu cotización ha sido generada con el desglose completo",
+      description: "Tu cotización ha sido generada exitosamente",
     });
   };
 
   const isFormValid = formData.origin && formData.destination && formData.date && formData.weight;
   const shouldShowMap = formData.origin && formData.destination;
 
-  const handleDistanceCalculated = (distance: string, duration: string) => {
-    setRouteInfo({ distance, duration });
-    // Extraer número de km
-    const kmMatch = distance.match(/[\d.]+/);
-    if (kmMatch) {
-      setDistanceKm(parseFloat(kmMatch[0]));
-    }
-  };
-
   return (
     <div className="space-y-6">
-      {/* Información básica */}
-      <Card className="border-border">
-        <CardHeader className="pb-4">
-          <CardTitle className="flex items-center gap-2 text-lg">
-            <Package className="h-5 w-5 text-flechandes-primary" />
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Package className="h-5 w-5 text-[#DB2851]" />
             Información del Flete
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="origin">Dirección de Origen (Retiro)</Label>
+              <Label htmlFor="origin">Origen</Label>
               <div className="relative">
-                <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   ref={originInputRef}
                   id="origin"
-                  placeholder="¿Dónde retiramos?"
+                  placeholder="Dirección de origen"
                   value={formData.origin}
                   onChange={(e) => handleInputChange('origin', e.target.value)}
                   className="pl-10"
                 />
               </div>
-              {isOriginRemote && (
-                <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
-                  <AlertTriangle className="h-3 w-3" />
-                  Zona remota detectada
-                </p>
-              )}
             </div>
             <div>
-              <Label htmlFor="destination">Dirección de Destino (Entrega)</Label>
+              <Label htmlFor="destination">Destino</Label>
               <div className="relative">
-                <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <MapPin className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   ref={destinationInputRef}
                   id="destination"
-                  placeholder="¿Dónde entregamos?"
+                  placeholder="Dirección de destino"
                   value={formData.destination}
                   onChange={(e) => handleInputChange('destination', e.target.value)}
                   className="pl-10"
                 />
               </div>
-              {isDestRemote && (
-                <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
-                  <AlertTriangle className="h-3 w-3" />
-                  Zona remota detectada
-                </p>
-              )}
             </div>
           </div>
 
@@ -186,36 +138,25 @@ const FreightQuoteForm = () => {
             <div>
               <Label htmlFor="date">Fecha de transporte</Label>
               <div className="relative">
-                <Calendar className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                <Calendar className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                 <Input
                   id="date"
                   type="date"
                   value={formData.date}
                   onChange={(e) => handleInputChange('date', e.target.value)}
                   className="pl-10"
-                  min={new Date().toISOString().split('T')[0]}
                 />
               </div>
             </div>
             <div>
               <Label htmlFor="weight">Peso aproximado (kg)</Label>
-              <div className="relative">
-                <Scale className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                <Input
-                  id="weight"
-                  type="number"
-                  placeholder="Ej: 50"
-                  value={formData.weight}
-                  onChange={(e) => handleInputChange('weight', e.target.value)}
-                  className="pl-10"
-                />
-              </div>
-              {weightKg > 100 && (
-                <p className="text-xs text-amber-600 mt-1 flex items-center gap-1">
-                  <AlertTriangle className="h-3 w-3" />
-                  Carga pesada: +${((weightKg - 100) * 50).toLocaleString('es-CL')} adicional
-                </p>
-              )}
+              <Input
+                id="weight"
+                type="number"
+                placeholder="Ej: 50"
+                value={formData.weight}
+                onChange={(e) => handleInputChange('weight', e.target.value)}
+              />
             </div>
           </div>
 
@@ -247,21 +188,9 @@ const FreightQuoteForm = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="normal">Normal</SelectItem>
-                  <SelectItem value="fragile">
-                    <span className="flex items-center gap-2">
-                      📦 Frágil (+$8.000)
-                    </span>
-                  </SelectItem>
-                  <SelectItem value="dangerous">
-                    <span className="flex items-center gap-2">
-                      ⚠️ Peligrosa (+$15.000)
-                    </span>
-                  </SelectItem>
-                  <SelectItem value="electronics">
-                    <span className="flex items-center gap-2">
-                      🔌 Electrónicos (+$5.000)
-                    </span>
-                  </SelectItem>
+                  <SelectItem value="fragile">Frágil</SelectItem>
+                  <SelectItem value="dangerous">Peligrosa</SelectItem>
+                  <SelectItem value="electronics">Electrónicos</SelectItem>
                   <SelectItem value="furniture">Muebles</SelectItem>
                 </SelectContent>
               </Select>
@@ -274,100 +203,79 @@ const FreightQuoteForm = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="normal">Normal (24-48 hrs)</SelectItem>
-                  <SelectItem value="urgent">
-                    <span className="flex items-center gap-2">
-                      ⏰ Urgente (12-24 hrs) +40%
-                    </span>
-                  </SelectItem>
-                  <SelectItem value="express">
-                    <span className="flex items-center gap-2">
-                      ⚡ Express (mismo día) +80%
-                    </span>
-                  </SelectItem>
+                  <SelectItem value="urgent">Urgente (12-24 hrs)</SelectItem>
+                  <SelectItem value="express">Express (mismo día)</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
+
+          <div>
+            <Label htmlFor="description">Descripción adicional (opcional)</Label>
+            <Textarea
+              id="description"
+              placeholder="Describe tu carga y cualquier detalle importante..."
+              value={formData.description}
+              onChange={(e) => handleInputChange('description', e.target.value)}
+              rows={3}
+            />
+          </div>
         </CardContent>
       </Card>
 
-      {/* Fricción Positiva - Acceso en destino */}
-      <StairsAccessSelector
-        hasElevator={destHasElevator}
-        floors={destFloors}
-        onElevatorChange={setDestHasElevator}
-        onFloorsChange={setDestFloors}
-        locationType="destination"
-      />
+      <div className="flex flex-col gap-4">
+        <Button
+          onClick={calculateQuote}
+          disabled={!isFormValid}
+          className="bg-[#DB2851] hover:bg-[#c11f45] text-white py-3 text-lg"
+          size="lg"
+        >
+          <DollarSign className="h-5 w-5 mr-2" />
+          Calcular Cotización
+        </Button>
 
-      {/* Peonetas (opcional para fletes) */}
-      <HelpersSelector
-        helpersCount={helpersCount}
-        onHelpersChange={setHelpersCount}
-        recommendedHelpers={recommendedHelpers}
-      />
-
-      {/* Descripción adicional */}
-      <Card className="border-border">
-        <CardContent className="p-4">
-          <Label htmlFor="description">Descripción de la carga (opcional)</Label>
-          <Textarea
-            id="description"
-            placeholder="Describe tu carga y cualquier detalle importante: fragilidad, instrucciones de manejo..."
-            value={formData.description}
-            onChange={(e) => handleInputChange('description', e.target.value)}
-            rows={3}
-            className="mt-2"
-          />
-        </CardContent>
-      </Card>
+        {quote && (
+          <Card className="bg-gradient-to-r from-[#DB2851]/10 to-[#009EE2]/10 border-2 border-[#DB2851]/20">
+            <CardContent className="p-6 text-center">
+              <h3 className="text-2xl font-bold text-gray-800 mb-2">Tu cotización estimada</h3>
+              <div className="text-4xl font-bold text-[#DB2851] mb-4">
+                ${quote.toLocaleString('es-CL')} CLP
+              </div>
+              <p className="text-gray-600 mb-4">
+                Esta es una estimación basada en la información proporcionada
+              </p>
+              <Button 
+                className="bg-[#009EE2] hover:bg-[#0080B9]"
+                onClick={() => window.location.href = '/customer/new-service'}
+              >
+                Solicitar Servicio
+              </Button>
+            </CardContent>
+          </Card>
+        )}
+      </div>
 
       {/* Mapa con ruta */}
       {shouldShowMap && (
-        <Card className="border-border overflow-hidden">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <MapPin className="h-5 w-5 text-flechandes-primary" />
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MapPin className="h-5 w-5 text-[#009EE2]" />
               Ruta del Flete
-              {routeInfo && (
-                <span className="ml-auto text-sm font-normal text-muted-foreground">
-                  {routeInfo.distance} • {routeInfo.duration}
-                </span>
-              )}
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-0">
+          <CardContent>
             <Map
               routeData={{
                 origin: formData.origin,
                 destination: formData.destination
               }}
-              onDistanceCalculated={handleDistanceCalculated}
+              onDistanceCalculated={(distance, duration) => {
+                setRouteInfo({ distance, duration });
+              }}
             />
           </CardContent>
         </Card>
-      )}
-
-      {/* Botón de calcular */}
-      <Button
-        onClick={calculateQuoteHandler}
-        disabled={!isFormValid}
-        className="w-full bg-flechandes-primary hover:bg-flechandes-primary/90 text-primary-foreground py-6 text-lg font-semibold"
-        size="lg"
-      >
-        <Calculator className="h-5 w-5 mr-2" />
-        Calcular Cotización
-      </Button>
-
-      {/* Resultado de cotización */}
-      {quoteBreakdown && (
-        <QuoteBreakdownCard
-          breakdown={quoteBreakdown}
-          vehicleName={VEHICLE_NAMES[formData.vehicle] || 'Vehículo'}
-          distanceKm={distanceKm}
-          durationMinutes={routeInfo ? parseInt(routeInfo.duration) : undefined}
-          serviceType="freight"
-        />
       )}
     </div>
   );
