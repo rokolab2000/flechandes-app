@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
 import SearchControls from './map/SearchControls';
 import RouteInfo from './map/RouteInfo';
@@ -21,6 +21,28 @@ interface Marker {
   position: google.maps.LatLngLiteral;
 }
 
+// Global state to track Google Maps loading
+let googleMapsPromise: Promise<string> | null = null;
+
+const loadGoogleMapsWithKey = async (): Promise<string> => {
+  if (googleMapsPromise) {
+    return googleMapsPromise;
+  }
+
+  googleMapsPromise = (async () => {
+    const { data, error } = await supabase.functions.invoke('get-google-maps-token');
+    
+    if (error || !data?.token) {
+      googleMapsPromise = null;
+      throw new Error('No se pudo obtener el token de Google Maps');
+    }
+    
+    return data.token;
+  })();
+
+  return googleMapsPromise;
+};
+
 const Map: React.FC<MapProps> = ({ 
   isCustomer = false, 
   showSearchBox = false, 
@@ -36,28 +58,29 @@ const Map: React.FC<MapProps> = ({
   const destinationInputRef = useRef<HTMLInputElement>(null);
   const originAutocomplete = useRef<google.maps.places.Autocomplete | null>(null);
   const destinationAutocomplete = useRef<google.maps.places.Autocomplete | null>(null);
+  const mapInitialized = useRef(false);
   
   const [origin, setOrigin] = useState('');
   const [destination, setDestination] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [googleMapsToken, setGoogleMapsToken] = useState<string | null>(null);
+  const [hasError, setHasError] = useState(false);
   const [routeDistance, setRouteDistance] = useState<string>('');
   const [routeDuration, setRouteDuration] = useState<string>('');
 
   // Inicializar autocompletado de Google Places
-  const initializeAutocomplete = () => {
-    if (!originInputRef.current || !destinationInputRef.current) return;
+  const initializeAutocomplete = useCallback(() => {
+    if (!originInputRef.current || !destinationInputRef.current || !window.google?.maps?.places) return;
 
     // Configurar autocompletado para origen
     originAutocomplete.current = new google.maps.places.Autocomplete(originInputRef.current, {
       types: ['address'],
-      componentRestrictions: { country: 'ar' }, // Restringir a Argentina
+      componentRestrictions: { country: 'cl' },
     });
 
     // Configurar autocompletado para destino
     destinationAutocomplete.current = new google.maps.places.Autocomplete(destinationInputRef.current, {
       types: ['address'],
-      componentRestrictions: { country: 'ar' }, // Restringir a Argentina
+      componentRestrictions: { country: 'cl' },
     });
 
     // Manejar selección de lugar para origen
@@ -75,33 +98,6 @@ const Map: React.FC<MapProps> = ({
         setDestination(place.formatted_address);
       }
     });
-  };
-
-  // Obtener el token de Google Maps desde Supabase
-  useEffect(() => {
-    const getGoogleMapsToken = async () => {
-      try {
-        console.log('🗺️ Intentando obtener token de Google Maps...');
-        const { data, error } = await supabase.functions.invoke('get-google-maps-token');
-        if (error) {
-          console.error('❌ Error obteniendo token de Google Maps:', error);
-          setIsLoading(false);
-          return;
-        }
-        if (!data?.token) {
-          console.error('❌ No se recibió token de Google Maps');
-          setIsLoading(false);
-          return;
-        }
-        console.log('✅ Token de Google Maps obtenido exitosamente');
-        setGoogleMapsToken(data.token);
-      } catch (error) {
-        console.error('❌ Error:', error);
-        setIsLoading(false);
-      }
-    };
-    
-    getGoogleMapsToken();
   }, []);
 
   // Datos simulados de ubicaciones
@@ -211,26 +207,33 @@ const Map: React.FC<MapProps> = ({
 
   // Inicializar mapa
   useEffect(() => {
-    if (!mapRef.current || !googleMapsToken) {
-      console.log('🗺️ Esperando elemento del mapa y token...', { mapRef: !!mapRef.current, token: !!googleMapsToken });
+    if (!mapRef.current || mapInitialized.current) {
       return;
     }
 
     const initMap = async () => {
       try {
         console.log('🗺️ Inicializando Google Maps...');
-        const loader = new Loader({
-          apiKey: googleMapsToken,
-          version: 'weekly',
-          libraries: ['places'],
-        });
-
-        await loader.load();
+        
+        const apiKey = await loadGoogleMapsWithKey();
+        
+        // Check if API is already loaded
+        if (!window.google?.maps) {
+          const loader = new Loader({
+            apiKey,
+            version: 'weekly',
+            libraries: ['places'],
+          });
+          await loader.load();
+        }
+        
         console.log('✅ Google Maps API cargada exitosamente');
 
+        if (!mapRef.current) return;
+
         // Crear mapa
-        mapInstance.current = new google.maps.Map(mapRef.current!, {
-          center: { lat: -34.6037, lng: -58.3816 }, // Buenos Aires
+        mapInstance.current = new google.maps.Map(mapRef.current, {
+          center: { lat: -33.4489, lng: -70.6693 }, // Santiago, Chile
           zoom: 12,
           styles: [
             {
@@ -246,7 +249,7 @@ const Map: React.FC<MapProps> = ({
         directionsRenderer.current = new google.maps.DirectionsRenderer({
           suppressMarkers: false,
           polylineOptions: {
-            strokeColor: '#009EE2', // Línea azul
+            strokeColor: '#009EE2',
             strokeWeight: 5,
           },
         });
@@ -277,34 +280,44 @@ const Map: React.FC<MapProps> = ({
               lng: position.coords.longitude,
             };
             
-            new google.maps.Marker({
-              position: userLocation,
-              map: mapInstance.current,
-              icon: {
-                path: google.maps.SymbolPath.CIRCLE,
-                scale: 10,
-                fillColor: '#009EE2',
-                fillOpacity: 1,
-                strokeColor: '#ffffff',
-                strokeWeight: 3,
-              },
-              title: 'Tu ubicación',
-            });
+            if (mapInstance.current) {
+              mapInstance.current.setCenter(userLocation);
+              
+              new google.maps.Marker({
+                position: userLocation,
+                map: mapInstance.current,
+                icon: {
+                  path: google.maps.SymbolPath.CIRCLE,
+                  scale: 10,
+                  fillColor: '#009EE2',
+                  fillOpacity: 1,
+                  strokeColor: '#ffffff',
+                  strokeWeight: 3,
+                },
+                title: 'Tu ubicación',
+              });
+            }
+          }, () => {
+            // Geolocation error - use default center
+            console.log('No se pudo obtener ubicación, usando Santiago por defecto');
           });
         }
 
         // Inicializar autocompletado después de que el mapa esté listo
         initializeAutocomplete();
 
+        mapInitialized.current = true;
         setIsLoading(false);
+        setHasError(false);
       } catch (error) {
         console.error('Error inicializando Google Maps:', error);
         setIsLoading(false);
+        setHasError(true);
       }
     };
 
     initMap();
-  }, [googleMapsToken]);
+  }, [initializeAutocomplete]);
 
   // Manejar cambios en routeData
   useEffect(() => {
@@ -351,7 +364,7 @@ const Map: React.FC<MapProps> = ({
     );
   }
 
-  if (!googleMapsToken) {
+  if (hasError) {
     return (
       <div className="flex items-center justify-center h-96 bg-muted rounded-lg border">
         <div className="flex flex-col items-center space-y-4 text-center px-4">
