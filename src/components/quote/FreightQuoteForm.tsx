@@ -62,7 +62,8 @@ const FreightQuoteForm = () => {
   };
 
   // Configure autocomplete for origin
-  useGoogleMapsAutocomplete(originInputRef, {
+  const { isReady: originReady } = useGoogleMapsAutocomplete(originInputRef, {
+    countryRestriction: 'cl',
     onPlaceSelected: (place) => {
       if (place.formatted_address) {
         setFormData(prev => ({ ...prev, origin: place.formatted_address || '' }));
@@ -71,7 +72,8 @@ const FreightQuoteForm = () => {
   });
 
   // Configure autocomplete for destination
-  useGoogleMapsAutocomplete(destinationInputRef, {
+  const { isReady: destReady } = useGoogleMapsAutocomplete(destinationInputRef, {
+    countryRestriction: 'cl',
     onPlaceSelected: (place) => {
       if (place.formatted_address) {
         setFormData(prev => ({ ...prev, destination: place.formatted_address || '' }));
