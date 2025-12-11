@@ -1,56 +1,83 @@
-
 import { useState } from 'react';
-
-interface Service {
-  id: string;
-  title: string;
-  type: 'moving' | 'delivery' | 'freight';
-  status: 'pending' | 'confirmed' | 'in-progress' | 'completed';
-  price: number;
-  origin: string;
-  destination: string;
-  date: string;
-  time: string;
-}
+import type { SmartOfferService } from '@/components/transporter/SmartOfferCard';
 
 export function useTransporterServices() {
-  // Datos de ejemplo para servicios
-  const [availableServices] = useState<Service[]>([
+  // Datos de ejemplo para servicios con información de riesgo
+  const [availableServices] = useState<SmartOfferService[]>([
     {
       id: '1',
-      title: 'Mudanza de Apartamento',
+      title: 'Mudanza Departamento 3 Pisos',
       type: 'moving',
       status: 'pending',
-      price: 280.00,
-      origin: '123 Primera Ave, Madrid',
-      destination: '456 Segunda Calle, Madrid',
-      date: '20 Jun, 2024',
-      time: '10:00 AM'
+      price: 85000,
+      origin: 'Av. Providencia 1234, Providencia',
+      destination: 'Los Leones 567, Providencia',
+      date: '20 Dic, 2024',
+      time: '10:00 AM',
+      vehicleType: 'camion_chico',
+      distance: 8,
+      specialObjects: ['piano'],
+      hasElevator: false,
+      floor: 4,
+      helpers: 2,
+      isRemoteZone: false
     },
     {
       id: '2',
-      title: 'Entrega de Muebles',
-      type: 'delivery',
+      title: 'Flete Muebles IKEA',
+      type: 'freight',
       status: 'pending',
-      price: 120.00,
-      origin: 'Tienda de Muebles, Madrid',
-      destination: '789 Tercera Ave, Madrid',
-      date: '25 Jun, 2024',
-      time: '13:00 PM'
+      price: 45000,
+      origin: 'IKEA Parque Arauco, Las Condes',
+      destination: 'Av. Apoquindo 4500, Las Condes',
+      date: '21 Dic, 2024',
+      time: '14:00 PM',
+      vehicleType: 'furgon',
+      distance: 5,
+      specialObjects: [],
+      hasElevator: true,
+      floor: 8,
+      helpers: 0,
+      isRemoteZone: false
+    },
+    {
+      id: '3',
+      title: 'Mudanza Oficina Completa',
+      type: 'moving',
+      status: 'pending',
+      price: 180000,
+      origin: 'Torre Costanera, Providencia',
+      destination: 'Parque Industrial Lampa',
+      date: '22 Dic, 2024',
+      time: '08:00 AM',
+      vehicleType: 'camion_grande',
+      distance: 35,
+      specialObjects: ['safe', 'fragile'],
+      hasElevator: true,
+      floor: 15,
+      helpers: 3,
+      isRemoteZone: true
     }
   ]);
   
-  const [acceptedServices] = useState<Service[]>([
+  const [acceptedServices] = useState<SmartOfferService[]>([
     {
-      id: '3',
-      title: 'Equipamiento de Oficina',
+      id: '4',
+      title: 'Flete Electrodomésticos',
       type: 'freight',
       status: 'confirmed',
-      price: 350.00,
-      origin: '101 Bulevar Empresarial, Madrid',
-      destination: '202 Calle Comercio, Madrid',
-      date: '18 Jun, 2024',
-      time: '08:00 AM'
+      price: 55000,
+      origin: 'Falabella Costanera Center',
+      destination: 'Ñuñoa Centro',
+      date: '19 Dic, 2024',
+      time: '16:00 PM',
+      vehicleType: 'camioneta',
+      distance: 7,
+      specialObjects: ['fragile'],
+      hasElevator: true,
+      floor: 3,
+      helpers: 1,
+      isRemoteZone: false
     }
   ]);
 
