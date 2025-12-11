@@ -1,25 +1,34 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { CalendarIcon, MapPin, Clock, Package, User, Phone, Mail } from 'lucide-react';
+import { CalendarIcon, MapPin, Clock, Package, User, Phone, Mail, TrendingUp, Users, AlertTriangle } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { type SmartOfferService } from './SmartOfferCard';
+import { generateRiskTags, calculateQuote, type QuoteInput, formatCLP, type VehicleType } from '@/lib/pricingEngine';
 
 interface ServiceDetailModalProps {
-  service: {
-    id: string;
-    title: string;
-    type: 'moving' | 'delivery' | 'freight';
-    status: 'pending' | 'confirmed' | 'in-progress' | 'completed';
-    price: number;
-    origin: string;
-    destination: string;
-    date: string;
-    time: string;
-  } | null;
+  service: SmartOfferService | null;
   isOpen: boolean;
   onClose: () => void;
 }
 
 const ServiceDetailModal = ({ service, isOpen, onClose }: ServiceDetailModalProps) => {
   if (!service) return null;
+
+  // Calculate quote and risk tags
+  const quoteInput: QuoteInput = {
+    vehicleType: service.vehicleType,
+    distanceKm: service.distance,
+    specialObjects: service.specialObjects,
+    originAccess: { hasElevator: service.hasElevator, floor: service.floor },
+    destinationAccess: { hasElevator: true, floor: 1 },
+    helpersCount: service.helpers,
+    isRemoteZone: service.isRemoteZone,
+    isB2B: false
+  };
+
+  const quote = calculateQuote(quoteInput);
+  const riskTags = generateRiskTags(quoteInput);
+  const netEarnings = Math.round(quote.total * 0.80);
 
   // Status translations
   const statusTranslations = {
@@ -29,66 +38,104 @@ const ServiceDetailModal = ({ service, isOpen, onClose }: ServiceDetailModalProp
     'completed': 'Completado',
   };
 
-  // Type translations and details
-  const typeDetails = {
-    'moving': {
-      name: 'Mudanza',
-      description: 'Traslado completo de vivienda u oficina',
-      items: ['Muebles', 'Electrodomésticos', 'Cajas', 'Objetos frágiles']
-    },
-    'delivery': {
-      name: 'Entrega',
-      description: 'Entrega de paquetes y productos',
-      items: ['Paquetes', 'Documentos', 'Productos varios']
-    },
-    'freight': {
-      name: 'Carga',
-      description: 'Transporte de mercancía pesada',
-      items: ['Equipamiento', 'Maquinaria', 'Materiales', 'Carga pesada']
-    },
+  // Type translations
+  const typeTranslations = {
+    'moving': 'Mudanza',
+    'freight': 'Flete'
   };
 
-  const serviceType = typeDetails[service.type];
+  // Vehicle translations
+  const vehicleTranslations: Record<VehicleType, string> = {
+    'furgon': 'Furgón',
+    'camioneta': 'Camioneta',
+    'camion_chico': 'Camión Chico',
+    'camion_mediano': 'Camión Mediano',
+    'camion_grande': 'Camión Grande'
+  };
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">{service.title}</DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-6">
-          {/* Service Type and Status */}
-          <div className="flex items-center justify-between">
+        <div className="space-y-5">
+          {/* Service Type, Vehicle and Status */}
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
-              <Package className="h-5 w-5 text-primary" />
-              <span className="font-medium">{serviceType.name}</span>
+              <Badge variant="outline">{typeTranslations[service.type]}</Badge>
+              <Badge variant="secondary">{vehicleTranslations[service.vehicleType]}</Badge>
             </div>
             <Badge variant="outline">
               {statusTranslations[service.status]}
             </Badge>
           </div>
 
-          {/* Description */}
-          <div>
-            <h3 className="font-medium mb-2">Descripción del Servicio</h3>
-            <p className="text-muted-foreground">{serviceType.description}</p>
+          {/* Risk Tags */}
+          {riskTags.length > 0 && (
+            <div>
+              <h3 className="font-medium mb-2 flex items-center gap-2">
+                <AlertTriangle className="h-4 w-4 text-amber-500" />
+                Etiquetas de Riesgo / Esfuerzo
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {riskTags.map((tag) => (
+                  <Badge 
+                    key={tag.id}
+                    className={`text-sm ${
+                      tag.severity === 'high' ? 'bg-red-100 text-red-700' :
+                      tag.severity === 'medium' ? 'bg-amber-100 text-amber-700' :
+                      'bg-blue-100 text-blue-700'
+                    }`}
+                  >
+                    {tag.icon} {tag.label}
+                  </Badge>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Net Earnings Card */}
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+            <div className="flex justify-between items-center">
+              <div>
+                <p className="text-sm text-green-700">Tu Ganancia Neta Estimada</p>
+                <p className="text-xs text-green-600">(después de comisión plataforma)</p>
+              </div>
+              <span className="text-3xl font-bold text-green-600">
+                {formatCLP(netEarnings)}
+              </span>
+            </div>
+            {service.helpers > 0 && (
+              <div className="mt-2 pt-2 border-t border-green-200">
+                <div className="flex items-center gap-2 text-sm text-green-700">
+                  <Users className="h-4 w-4" />
+                  <span>Ganancia peoneta: {formatCLP(Math.round(quote.helperEarnings / service.helpers))} c/u</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Route Information */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <h3 className="font-medium mb-2 flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
+                <MapPin className="h-4 w-4 text-green-600" />
                 Origen
               </h3>
               <p className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
                 {service.origin}
               </p>
+              {!service.hasElevator && service.floor > 1 && (
+                <p className="text-xs text-amber-600 mt-1">
+                  ⚠️ Piso {service.floor} sin ascensor
+                </p>
+              )}
             </div>
             <div>
               <h3 className="font-medium mb-2 flex items-center gap-2">
-                <MapPin className="h-4 w-4" />
+                <MapPin className="h-4 w-4 text-red-600" />
                 Destino
               </h3>
               <p className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
@@ -97,33 +144,73 @@ const ServiceDetailModal = ({ service, isOpen, onClose }: ServiceDetailModalProp
             </div>
           </div>
 
-          {/* Date and Time */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Date, Time, Distance */}
+          <div className="grid grid-cols-3 gap-4">
             <div>
-              <h3 className="font-medium mb-2 flex items-center gap-2">
+              <h3 className="font-medium mb-1 flex items-center gap-2 text-sm">
                 <CalendarIcon className="h-4 w-4" />
                 Fecha
               </h3>
               <p className="text-sm text-muted-foreground">{service.date}</p>
             </div>
             <div>
-              <h3 className="font-medium mb-2 flex items-center gap-2">
+              <h3 className="font-medium mb-1 flex items-center gap-2 text-sm">
                 <Clock className="h-4 w-4" />
                 Hora
               </h3>
               <p className="text-sm text-muted-foreground">{service.time}</p>
             </div>
+            <div>
+              <h3 className="font-medium mb-1 flex items-center gap-2 text-sm">
+                <TrendingUp className="h-4 w-4" />
+                Distancia
+              </h3>
+              <p className="text-sm text-muted-foreground">{service.distance} km</p>
+            </div>
           </div>
 
-          {/* Items to Transport */}
+          {/* Price Breakdown */}
           <div>
-            <h3 className="font-medium mb-2">Elementos a Transportar</h3>
-            <div className="flex flex-wrap gap-2">
-              {serviceType.items.map((item, index) => (
-                <Badge key={index} variant="secondary">
-                  {item}
-                </Badge>
-              ))}
+            <h3 className="font-medium mb-2">Desglose del Precio</h3>
+            <div className="bg-muted rounded-lg p-3 space-y-1 text-sm">
+              <div className="flex justify-between">
+                <span>Base vehículo</span>
+                <span>{formatCLP(quote.baseVehicle)}</span>
+              </div>
+              {quote.distanceCharge > 0 && (
+                <div className="flex justify-between">
+                  <span>Distancia extra</span>
+                  <span>{formatCLP(quote.distanceCharge)}</span>
+                </div>
+              )}
+              {quote.remoteZoneCharge > 0 && (
+                <div className="flex justify-between text-amber-600">
+                  <span>Zona remota</span>
+                  <span>{formatCLP(quote.remoteZoneCharge)}</span>
+                </div>
+              )}
+              {quote.stairsOrigin > 0 && (
+                <div className="flex justify-between text-amber-600">
+                  <span>Escaleras origen</span>
+                  <span>{formatCLP(quote.stairsOrigin)}</span>
+                </div>
+              )}
+              {quote.helpersCharge > 0 && (
+                <div className="flex justify-between">
+                  <span>Peonetas ({service.helpers})</span>
+                  <span>{formatCLP(quote.helpersCharge)}</span>
+                </div>
+              )}
+              {quote.specialObjectsCharge > 0 && (
+                <div className="flex justify-between text-red-600">
+                  <span>Objetos especiales</span>
+                  <span>{formatCLP(quote.specialObjectsCharge)}</span>
+                </div>
+              )}
+              <div className="flex justify-between font-bold pt-2 border-t">
+                <span>Total cliente</span>
+                <span>{formatCLP(quote.total)}</span>
+              </div>
             </div>
           </div>
 
@@ -137,7 +224,7 @@ const ServiceDetailModal = ({ service, isOpen, onClose }: ServiceDetailModalProp
               </div>
               <div className="flex items-center gap-2">
                 <Phone className="h-4 w-4 text-muted-foreground" />
-                <span>+34 612 345 678</span>
+                <span>+56 9 1234 5678</span>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="h-4 w-4 text-muted-foreground" />
@@ -146,25 +233,17 @@ const ServiceDetailModal = ({ service, isOpen, onClose }: ServiceDetailModalProp
             </div>
           </div>
 
-          {/* Price */}
-          <div className="bg-primary/5 p-4 rounded-lg">
-            <div className="flex justify-between items-center">
-              <span className="font-medium">Precio del Servicio</span>
-              <span className="text-2xl font-bold text-primary">€{service.price.toFixed(2)}</span>
-            </div>
-          </div>
-
-          {/* Additional Notes */}
-          <div>
-            <h3 className="font-medium mb-2">Notas Adicionales</h3>
-            <p className="text-sm text-muted-foreground bg-muted p-3 rounded-md">
-              {service.type === 'moving' 
-                ? 'Apartamento de 2 habitaciones en tercer piso sin ascensor. Se requiere especial cuidado con piano vertical.'
-                : service.type === 'delivery'
-                ? 'Entrega en horario de oficina. Contactar 30 minutos antes de llegar.'
-                : 'Equipo pesado, se requiere montacargas. Acceso por entrada trasera del edificio.'
-              }
-            </p>
+          {/* Actions */}
+          <div className="flex gap-3 pt-2">
+            <Button variant="outline" className="flex-1" onClick={onClose}>
+              Cerrar
+            </Button>
+            <Button variant="destructive" className="flex-1">
+              Rechazar
+            </Button>
+            <Button className="flex-1 bg-green-600 hover:bg-green-700">
+              Aceptar Trabajo
+            </Button>
           </div>
         </div>
       </DialogContent>

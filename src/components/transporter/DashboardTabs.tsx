@@ -1,22 +1,21 @@
-
 import { useState, useEffect } from 'react';
 import Map from '@/components/Map';
-import ServiceCard from '@/components/ServiceCard';
+import SmartOfferCard, { type SmartOfferService } from '@/components/transporter/SmartOfferCard';
 import ServiceDetailModal from '@/components/transporter/ServiceDetailModal';
-import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { toast } from 'sonner';
 
 interface DashboardTabsProps {
-  availableServices: any[];
-  acceptedServices: any[];
+  availableServices: SmartOfferService[];
+  acceptedServices: SmartOfferService[];
 }
 
 const DashboardTabs = ({ availableServices, acceptedServices }: DashboardTabsProps) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState<'map' | 'available' | 'accepted'>('map');
+  const [activeTab, setActiveTab] = useState<'map' | 'available' | 'accepted'>('available');
   const [routeData, setRouteData] = useState<{ origin: string; destination: string } | null>(null);
-  const [selectedService, setSelectedService] = useState<any>(null);
+  const [selectedService, setSelectedService] = useState<SmartOfferService | null>(null);
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
 
   // Check if we should display a route on the map
@@ -30,21 +29,29 @@ const DashboardTabs = ({ availableServices, acceptedServices }: DashboardTabsPro
     }
   }, [location.state]);
 
+  const handleAccept = (id: string) => {
+    toast.success('Trabajo aceptado! Te notificaremos cuando el cliente confirme.');
+  };
+
+  const handleReject = (id: string) => {
+    toast.info('Trabajo rechazado');
+  };
+
+  const handleViewMap = (service: SmartOfferService) => {
+    setActiveTab('map');
+    setRouteData({ origin: service.origin, destination: service.destination });
+  };
+
+  const handleViewDetails = (service: SmartOfferService) => {
+    setSelectedService(service);
+    setIsDetailModalOpen(true);
+  };
+
   return (
     <>
       <div className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
         {/* Tabs */}
         <div className="flex border-b border-gray-100">
-          <button
-            className={`flex-1 py-3 px-4 text-center font-medium ${
-              activeTab === 'map' 
-                ? 'text-move-green-600 border-b-2 border-move-green-500' 
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-            onClick={() => setActiveTab('map')}
-          >
-            Mapa
-          </button>
           <button
             className={`flex-1 py-3 px-4 text-center font-medium ${
               activeTab === 'available' 
@@ -53,7 +60,7 @@ const DashboardTabs = ({ availableServices, acceptedServices }: DashboardTabsPro
             }`}
             onClick={() => setActiveTab('available')}
           >
-            Trabajos Disponibles
+            Trabajos Disponibles ({availableServices.length})
           </button>
           <button
             className={`flex-1 py-3 px-4 text-center font-medium ${
@@ -63,7 +70,17 @@ const DashboardTabs = ({ availableServices, acceptedServices }: DashboardTabsPro
             }`}
             onClick={() => setActiveTab('accepted')}
           >
-            Mis Trabajos
+            Mis Trabajos ({acceptedServices.length})
+          </button>
+          <button
+            className={`flex-1 py-3 px-4 text-center font-medium ${
+              activeTab === 'map' 
+                ? 'text-move-green-600 border-b-2 border-move-green-500' 
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+            onClick={() => setActiveTab('map')}
+          >
+            Mapa
           </button>
         </div>
         
@@ -79,60 +96,38 @@ const DashboardTabs = ({ availableServices, acceptedServices }: DashboardTabsPro
             </div>
           ) : (
             <div className="p-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 {activeTab === 'available' ? (
                   availableServices.length > 0 ? (
                     availableServices.map((service) => (
-                      <div key={service.id} className="relative">
-                        <ServiceCard
-                          {...service}
-                          onClick={() => navigate(`/transporter/job/${service.id}`)}
-                        />
-                        <div className="absolute bottom-4 right-4 flex gap-2">
-                          <Button 
-                            variant="outline"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSelectedService(service);
-                              setIsDetailModalOpen(true);
-                            }}
-                          >
-                            Ver Detalles
-                          </Button>
-                          <Button 
-                            variant="outline"
-                            size="sm"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setActiveTab('map');
-                              setRouteData({ origin: service.origin, destination: service.destination });
-                            }}
-                          >
-                            Ver en Mapa
-                          </Button>
-                          <Button className="bg-move-green-500 hover:bg-move-green-600">
-                            Aceptar Trabajo
-                          </Button>
-                        </div>
-                      </div>
+                      <SmartOfferCard
+                        key={service.id}
+                        service={service}
+                        onAccept={handleAccept}
+                        onReject={handleReject}
+                        onViewMap={handleViewMap}
+                        onViewDetails={handleViewDetails}
+                      />
                     ))
                   ) : (
-                    <div className="col-span-2 py-8 text-center text-gray-500">
+                    <div className="py-8 text-center text-gray-500">
                       No hay trabajos disponibles en tu área
                     </div>
                   )
                 ) : (
                   acceptedServices.length > 0 ? (
                     acceptedServices.map((service) => (
-                      <ServiceCard
+                      <SmartOfferCard
                         key={service.id}
-                        {...service}
-                        onClick={() => navigate(`/transporter/job/${service.id}`)}
+                        service={service}
+                        onAccept={handleAccept}
+                        onReject={handleReject}
+                        onViewMap={handleViewMap}
+                        onViewDetails={handleViewDetails}
                       />
                     ))
                   ) : (
-                    <div className="col-span-2 py-8 text-center text-gray-500">
+                    <div className="py-8 text-center text-gray-500">
                       No has aceptado ningún trabajo aún
                     </div>
                   )
