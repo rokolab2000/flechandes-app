@@ -1,1 +1,7 @@
 project_id = "wskosbuvimxntcdfszij"
+
+[functions.get-google-maps-token]
+verify_jwt = false
+
+[functions.quote-chat]
+verify_jwt = false
